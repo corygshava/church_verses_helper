@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"content="width=device-width,initial-scale=1">
+	<title>Sender</title>
+
+    <link rel="stylesheet" href="css/fa-all.css">
+	<link rel="stylesheet" href="css/styles.css">
+	<link rel="stylesheet" href="css/common.css">
+	<link rel="stylesheet" href="css/w3.css">
+	<link rel="stylesheet" href="css/coryG_base.css">
+
+	<script src="js/customalerter.js"></script>
+	<script src="js/SuperScript.js"></script>
+	<script src="js/toappend.js"></script>
+	<script src="js/animate.js"></script>
+</head>
+<body>
+	<div class="senderbox w3-center">
+		<h1>Send a verse</h1>
+		<span class="tiptxt">--</span>
+		<input id="msg" placeholder="enter bible verse here..." list="bookslist" />
+		<datalist id="bookslist">
+			<option value="Matthew"></option>
+			<option value="Mark"></option>
+			<option value="Luke"></option>
+			<option value="John"></option>
+		</datalist>
+		<button onclick="sendmsg()" class="themebtn">Send <i class="fa fa-paper-plane"></i></button>
+	</div>
+
+	<div class="senderbox controls gap-sm" style="display: none;">
+		<div class="curverse w3-center">
+			<h1 class="hed1">John 3:16</h1>
+			<span>current verse</span>
+		</div>
+		<div class="navbtns">
+			<button class="btn primary"><i class="fa fa-chevron-left"></i> previous</button>
+			<button class="btn primary">next <i class="fa fa-chevron-right"></i></button>
+		</div>
+		<div>
+			<hr class="w3-border" style="color: inherit;width: min(25vw, 200px);">
+		</div>
+		<button class="themebtn" onclick="updateUI(1)"><i class="fa fa-book"></i> enter new verse</button>
+	</div>
+
+	<script src="js/app.js"></script>
+	<script src="js/biblebooks.js"></script>
+
+	<script>
+		// UIs
+		let bkslist = undefined;
+		let tipguy = undefined;
+		let nptguy = undefined;
+		let curverse = undefined;
+		let controls = undefined;
+
+		// runtime data
+		let thebks = [];
+		let curversedata = {}
+
+		// UI ops
+		function initUIs() {
+			bkslist = document.querySelector('#bookslist');
+			tipguy = document.querySelector('.tiptxt');
+			nptguy = document.querySelector('#msg');
+			curverse = document.querySelector('.curverse>h1');
+			controls = document.querySelectorAll('.navbtns>.btn');
+
+			// make UI events
+			nptguy.addEventListener('input',() => {
+				gettips();
+			})
+
+			controls[0].addEventListener('click', () => {
+				getnext_passage(-1);
+			})
+
+			controls[1].addEventListener('click', () => {
+				getnext_passage(1);
+			})
+		}
+
+		function loadbibleverses() {
+			bkslist.innerHTML = "";
+
+			thebks = getallbooks();
+
+			thebks.forEach(el => {
+				let opt = `<option value="${el.name}"></option>`;
+				bkslist.innerHTML += opt;
+			})
+		}
+
+		function gettips() {
+			let tip = "start typing to get tips";
+			let txt = nptguy.value.toLowerCase().trim();
+			let conti = true;
+
+			if(txt != ""){
+				if(!txt.includes(":")){
+					// remove any numbers but dont remove the prefix ones
+					txt = txt.replace(/(?<=\b)(?!^\d)\d+/g, '').trim();
+					// console.log("post processed: " + txt)
+
+					// see if the book is in the list provided no chapter was entered yet
+					let tmp_found = 0,found_id = undefined;
+
+					thebks.forEach((el,id) => {
+						let tmp_con = el.name.toLowerCase() == txt;
+						if(tmp_con){
+							tmp_found += 1;
+							found_id = id;
+						} else {
+							// console.log(`${el.name.toLowerCase()} == ${txt} -> ${tmp_con}`);
+						}
+					})
+
+					if(tmp_found > 0){
+						let tmp_chaps = thebks[found_id].chapters;
+						let cap = plural("chapter",Number(tmp_chaps));
+						tip = `${txt} has ${tmp_chaps} ${cap}`;
+					} else {
+						tip = `<b>${txt}</b> is not a valid book`;
+					}
+				} else {
+					let hay = txt.split(" ");
+					let needle = hay.pop().split(":")[0];
+					let book = hay.join(" ");
+					let n = undefined;
+
+					// find the book in the list, again
+					let tmp_found = 0,found_id = undefined;
+
+					thebks.forEach((el,id) => {
+						let tmp_con = el.name.toLowerCase() == book;
+						if(tmp_con){
+							tmp_found += 1;
+							found_id = id;
+						} else {
+							// console.log(`${el.name.toLowerCase()} == ${txt} -> ${tmp_con}`);
+						}
+					})
+
+					if(tmp_found > 0){
+						n = thebks[found_id].verses[needle - 1];
+						if(n != undefined){
+							let cap = plural("verse",Number(n));
+							tip = `${book} ${needle} has ${n} ${cap}`;
+						} else {
+							tip = "that chapter doesnt exist";
+						}
+					} else {
+						tip = `<b>${txt}</b> is not a valid book`;
+					}
+
+				}
+			}
+
+			tipguy.innerHTML = `<i>${tip}</i>`;
+		}
+
+		function updateUI(n) {
+			// switches between tab 1 and 0
+			let tabs = document.querySelectorAll('.senderbox');
+			let active = tabs[n];
+			let passive = tabs[(n + 1) % tabs.length];
+
+			active.animate(slideout,{...timing});
+
+			setTimeout(() => {
+				// hide active
+				active.style.display = "none";
+				// animatein passive
+				passive.animate(hideme,{...timing,duration: 100});
+				passive.style.display = "flex";
+				passive.style.display = "flex";
+				passive.animate(slidein,{...timing,delay: 100});
+			},timing.duration)
+		}
+
+		function showreport(){
+			let cd = curversedata;
+			let passage = `${cd.book} ${cd.chapter}:${cd.verse}`;
+			curverse.innerHTML = passage;
+
+			controls.forEach(el => {el.style.display = "inline-flex"})
+
+			if(passage.toLowerCase() == "revelation 22:21"){
+				controls[1].style.display = "none";
+				alert_warning("found end");
+			} else if(passage.toLowerCase() == "genesis 1:1"){
+				controls[0].style.display = "none";
+				alert_warning("found start");
+			}
+		}
+
+		function getnext_passage(offset) {
+			let cd = {...curversedata};
+
+			cd.verse = Number(cd.verse) + offset;
+
+			let passage = `${cd.book} ${cd.chapter}:${cd.verse}`;
+			nptguy.value = passage;
+			if(analysemsg(passage))
+				sendmsg();
+		}
+
+		// runtime stuff
+		function analysemsg(msg) {
+			let [book, chapter, verse, fincon] = [0,0,0,false];
+			let tip = "";
+			let cap = "";
+
+
+			if(!msg.includes(":")){
+				tip = "incomplete verse";
+			} else {
+				let hay = msg.split(":");
+				let tmp_fore = hay[0].split(" ");
+				let tmp_latter = hay[1].split("-");
+
+				chapter = tmp_fore.pop();
+				book = tmp_fore.join(" ").toLowerCase();
+				verse = tmp_latter[0];
+
+				console.log("latter -> ", tmp_latter[0])
+				console.log("analysing...",book, chapter, verse)
+
+				// find the book in the list, again
+				let tmp_found = 0,found_id = undefined;
+
+				thebks.forEach((el,id) => {
+					let tmp_con = el.name.toLowerCase() == book;
+					if(tmp_con){
+						tmp_found += 1;
+						found_id = id;
+					} else {
+						// console.log(`${el.name.toLowerCase()} == ${txt} -> ${tmp_con}`);
+					}
+				})
+
+				if(tmp_found > 0){
+					// check if chapters are ok
+					let chaps = thebks[found_id].chapters;
+					cap = plural("chapter",Number(chaps));
+					fincon = chapter <= chaps;
+
+					if(fincon){
+						// check if verses are okay
+						let n = thebks[found_id].verses[chapter - 1];
+						cap = plural("verse",Number(n));
+						fincon = Number(verse) < (Number(n) + 1);
+
+						console.log(`analysing verse: ${verse} <= ${n} -> ${fincon}`);
+						tip = fincon ? "" : `${book} ${chapter} has only ${n} ${cap}`;
+					} else {
+						tip = `${book} has only ${chaps} ${cap}`;
+					}
+				} else {
+					tip = `<b>${book}</b> is not a valid book`;
+				}
+			}
+
+			if(!fincon){
+				alert_danger(tip,3);
+			} else {
+				curversedata = {book, chapter, verse};
+			}
+
+			return fincon;
+		}
+
+		function sendmsg() {
+			let themsg = nptguy.value;
+
+			if(themsg != ""){
+				if(analysemsg(themsg)){
+					sendMessage();
+					updateUI(0);
+
+					showreport();
+				}
+			} else {
+				alert_danger("enter a verse first",2);
+			}
+		}
+
+		// event listeners
+		window.addEventListener('load',() => {
+			initUIs();
+			loadbibleverses();
+		})
+	</script>
+</body>
+</html>

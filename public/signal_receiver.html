@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"content="width=device-width,initial-scale=1">
+	<title>Receiver</title>
+
+	<link rel="stylesheet" href="css/styles.css">
+	<link rel="stylesheet" href="css/common.css">
+	<link rel="stylesheet" href="css/w3.css">
+
+	<script src="js/customalerter.js"></script>
+	<script src="js/SuperScript.js"></script>
+	<script src="js/toappend.js"></script>
+	<script src="js/animate.js"></script>
+</head>
+<body class="centroid versival">
+	<div class="content versedisplay">
+		<!-- <h1>Receiver Output:</h1> -->
+		<span class="verse-text" id="gottenverse">...</span>
+		<span class="verse-location" id="output">Waiting for verse...</span>
+	</div>
+
+	<script src="js/app.js"></script>
+
+	<script>
+		// ui items
+		let passage = undefined;
+		let verse = undefined;
+		let versedisplay = undefined;
+
+		function initUIs() {
+			passage = document.querySelector('#gottenverse');
+			verse = document.querySelector('#output');
+			versedisplay = document.querySelector('.versedisplay');
+		}
+
+		// functions specific to signal_receiver --------------------------------
+
+		function hideverseguy(){
+			passage.animate(fadeout,timing);
+		}
+
+		function showverseguy(){
+			autoResizeText(passage,versedisplay,16,102,() => {alert_warning("text overflow")})
+			passage.animate(slidein,timing);
+		}
+
+		// event listeners
+		window.addEventListener('load',() => {
+			initUIs();
+		})
+
+		// end ------------------------------------------------------------------
+	
+		let words = [];
+
+		function autoResizeText({
+			textElement,
+			containerElement,
+			minFontSize = 12,
+			segmentCharLength = 30,
+			onResizeLimitReached = () => {},
+		}) {
+			console.log(textElement)
+			return;
+			let fontSize = parseFloat(window.getComputedStyle(textElement).fontSize);
+			const originalText = textElement.textContent;
+
+			function fits() {
+				return textElement.scrollWidth <= containerElement.clientWidth &&
+							 textElement.scrollHeight <= containerElement.clientHeight;
+			}
+
+			// Step 1: Reduce font size until it fits or hits minimum
+			while (!fits() && fontSize > minFontSize) {
+				fontSize -= 1;
+				textElement.style.fontSize = fontSize + 'px';
+			}
+
+			// Step 2: If it still doesn't fit, start trimming
+			if (!fits()) {
+				onResizeLimitReached();
+
+				let currentText = originalText;
+				textElement.textContent = currentText;
+
+				// Binary search the max number of characters that fit
+				let low = 0;
+				let high = currentText.length;
+				let fitLength = 0;
+
+				while (low <= high) {
+					const mid = Math.floor((low + high) / 2);
+					textElement.textContent = currentText.slice(0, mid);
+					if (fits()) {
+						fitLength = mid;
+						low = mid + 1;
+					} else {
+						high = mid - 1;
+					}
+				}
+
+				// Final fit text
+				const finalFitText = currentText.slice(0, fitLength);
+				textElement.textContent = finalFitText;
+
+				// Step 3: Split into segments of defined length
+				words = [];
+				for (let i = 0; i < finalFitText.length; i += segmentCharLength) {
+					words.push(finalFitText.slice(i, i + segmentCharLength));
+				}
+			}
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+make the index page
+    here the user can either mirror the receiver or go to sender
+work on the sender's page
+    make the inputs and everything more ergonomic
+    introduce fontawesome for icons
+    introduce my UI kit for styles
+    make it that bible book suggestions show up as the person types
+    make it that it tells the user how many chapters and verses a book has
+    make it that once a verse is sent a new panel pops up that allows one to navigate to the next chapter or the previous one
+        the panel has options for `new verse`, `next verse` and `previous verse`

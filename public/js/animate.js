@@ -1,0 +1,42 @@
+let timing = {
+	duration: 300,
+	easing: "ease-out",
+	fill:"forwards"
+}
+
+let slideout = [
+  {
+    "offset": 0,
+    "transform": "translateX(0)",
+    "opacity": 1
+  },
+  {
+    "offset": 1,
+    "transform": "translateX(1000px)",
+    "opacity": 0
+  }
+];
+
+let slidein = [
+  {
+    "offset": 0.01,
+    "transform": "rotateX(-30deg) translateX(-300px) skewX(-30deg)",
+    "opacity": 0
+  },
+  {
+    "offset": 1,
+    "transform": "rotateX(0deg) translateX(0) skewX(0deg)",
+    "opacity": 1
+  }
+]
+
+let hideme = [
+  {opacity: 0},
+  {opacity: 0}
+]
+
+let fadeout = [
+  {opacity: 1},
+  {opacity: 0}
+]
+
