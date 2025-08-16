@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Worship Helper PRO</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background: #222;
+      color: #fff;
+    }
+    header .actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    .panel {
+      padding: 0.5rem;
+      overflow-y: auto;
+    }
+    #layers {
+      width: 20%;
+      background: #f3f3f3;
+      border-right: 1px solid #ccc;
+    }
+    #canvas {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #eee;
+    }
+    #properties {
+      width: 25%;
+      background: #fafafa;
+      border-left: 1px solid #ccc;
+    }
+    .layer-item {
+      padding: 0.3rem;
+      margin: 0.2rem 0;
+      background: #ddd;
+      cursor: pointer;
+    }
+    .layer-item.active {
+      background: #bbb;
+    }
+    .dark body, .dark header { background:#111; color:#eee; }
+  </style>
+
+  <script src="js/app.js"></script>
+</head>
+<body>
+  <header>
+    <div class="left">Worship Helper PRO</div>
+    <div class="actions">
+      <select id="sceneSwitcher"></select>
+      <input type="file" id="importScene" accept="application/json">
+      <button id="themeToggle">Toggle Theme</button>
+    </div>
+  </header>
+  <main>
+    <div id="layers" class="panel"></div>
+    <div id="canvas" class="panel">
+      <div class="content versedisplay">
+        <span class="verse-text" id="gottenverse">...</span>
+        <span class="verse-location" id="output">Waiting for verse...</span>
+      </div>
+    </div>
+    <div id="properties" class="panel">
+      <h3>Properties</h3>
+      <div id="propsContainer"></div>
+      <button id="sendPayload">Send Payload</button>
+    </div>
+  </main>
+
+  <script>
+    let thescenes = [];
+    let currentScene = null;
+    let selectedElement = null;
+    let ws = socket; // adjust for your WS server
+
+    // Mock fetch
+    async function apiGetScenes() {
+      try {
+        let res = await fetch("/api_getscenes");
+        let data = await res.json();
+        if (data.success) return data.echo;
+        else throw new Error(data.echo);
+      } catch {
+        return [{
+          scenename: "Default",
+          scenetemplate: `
+            <div class="content versedisplay" data-role="[background]">
+              <span class="verse-text" id="gottenverse" data-role="[text1name]">Sample Verse</span>
+              <span class="verse-location" id="output" data-role="[text2name]">Waiting for verse...</span>
+            </div>`,
+          myelements: [
+            { mytype: "text", demotext: "Sample Verse" },
+            { mytype: "background", demotext: "" }
+          ],
+          datecreated: new Date().toISOString()
+        }];
+      }
+    }
+
+    function renderSceneList() {
+      const sel = document.getElementById("sceneSwitcher");
+      sel.innerHTML = "";
+      thescenes.forEach((s, i) => {
+        let opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = s.scenename;
+        sel.appendChild(opt);
+      });
+      sel.value = 0;
+      setScene(0);
+    }
+
+    function setScene(index) {
+      currentScene = thescenes[index];
+      renderLayers();
+      renderCanvas();
+    }
+
+    function renderLayers() {
+      const cont = document.getElementById("layers");
+      cont.innerHTML = "";
+      currentScene.myelements.forEach((el, i) => {
+        let div = document.createElement("div");
+        div.className = "layer-item";
+        div.textContent = el.mytype;
+        div.onclick = () => selectElement(el, div);
+        cont.appendChild(div);
+      });
+      // add slide layer
+      let slide = document.createElement("div");
+      slide.className = "layer-item";
+      slide.textContent = "slide";
+      slide.onclick = () => selectElement({ mytype: "slide" }, slide);
+      cont.appendChild(slide);
+    }
+
+    function renderCanvas() {
+      document.querySelector("#canvas .content").outerHTML = currentScene.scenetemplate;
+    }
+
+    function selectElement(el, dom) {
+      document.querySelectorAll(".layer-item").forEach(x => x.classList.remove("active"));
+      dom.classList.add("active");
+      selectedElement = el;
+      renderProperties();
+    }
+
+    function renderProperties() {
+      const c = document.getElementById("propsContainer");
+      c.innerHTML = "";
+      if (!selectedElement) return;
+      if (selectedElement.mytype === "text") {
+        c.innerHTML = `
+          <label>Text Color <input type="color" id="txt_color"></label><br>
+          <label>Font Weight <input type="number" id="txt_weight" min="200" max="900"></label><br>
+          <label>Outline Color <input type="color" id="txt_outline"></label><br>
+          <label>Outline Width <input type="number" id="txt_outline_w"></label><br>
+          <label>Font Size <input type="number" id="txt_size"></label><br>
+          <label>Font Family <input type="text" id="txt_font"></label><br>
+        `;
+      } else if (selectedElement.mytype === "background") {
+        c.innerHTML = `
+          <label>Style 
+            <select id="bg_style">
+              <option value="plain">Plain</option>
+              <option value="gradient">Gradient</option>
+              <option value="image">Image</option>
+            </select>
+          </label><br>
+          <div id="bgOptions"></div>
+        `;
+      } else if (selectedElement.mytype === "slide") {
+        c.innerHTML = `
+          <label>Entrance Animation 
+            <select id="slide_enter">
+              <option>fadeIn</option><option>slideIn</option><option>zoomIn</option>
+            </select></label><br>
+          <label>Duration <input type="text" id="slide_enter_duration"></label><br>
+          <label>Easing <input type="text" id="slide_enter_easing"></label><br>
+          <label>Exit Animation 
+            <select id="slide_exit">
+              <option>fadeOut</option><option>slideOut</option><option>zoomOut</option>
+            </select></label><br>
+          <label>Duration <input type="text" id="slide_exit_duration"></label><br>
+          <label>Easing <input type="text" id="slide_exit_easing"></label><br>
+        `;
+      }
+    }
+
+    async function sendPayload() {
+      const payload = {
+        scene: currentScene.scenename,
+        txtstyles: {}, bgstyles: {}, slidestyles: {}
+      };
+      // (for brevity, not extracting all fields here)
+      console.log("Payload:", payload);
+
+      await fetch("/api_stylesmanager", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(payload));
+      }
+    }
+
+    // init
+    window.onload = async () => {
+      thescenes = await apiGetScenes();
+      renderSceneList();
+      document.getElementById("sceneSwitcher").onchange = e => setScene(e.target.value);
+      document.getElementById("sendPayload").onclick = sendPayload;
+      document.getElementById("themeToggle").onclick = () => {
+        document.body.classList.toggle("dark");
+      };
+      document.getElementById("importScene").onchange = async e => {
+        let file = e.target.files[0];
+        if (!file) return;
+        let text = await file.text();
+        let json = JSON.parse(text);
+        thescenes.push(json);
+        renderSceneList();
+      };
+    };
+  </script>
+</body>
+</html>

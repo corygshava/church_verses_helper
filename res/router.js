@@ -1,9 +1,12 @@
-function handlereq(path,body, callback){
+async function handlereq(path,body, callback){
+	let res = {success: false,echo: 'Invalid endpoint'}
+
 	if(path === '/api_test'){
-		callback({success: true,echo: body})
-	} else {
-		callback({success: false,echo: 'Invalid endpoint'})
+		res = {success: true,echo: body};
 	}
+
+	callback(res)
+	return res;
 }
 
 module.exports = {handlereq}
