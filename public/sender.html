@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport"content="width=device-width,initial-scale=1">
-	<title>Sender</title>
+	<title>Remote</title>
 
     <link rel="stylesheet" href="css/fa-all.css">
 	<link rel="stylesheet" href="css/styles.css">
@@ -17,7 +17,7 @@
 	<script src="js/animate.js"></script>
 </head>
 <body>
-	<div class="senderbox w3-center">
+	<div class="senderbox section w3-center">
 		<h1>Send a verse</h1>
 		<span class="tiptxt">--</span>
 		<input id="msg" placeholder="enter bible verse here..." list="bookslist" />
@@ -30,7 +30,7 @@
 		<button onclick="sendmsg()" class="themebtn">Send <i class="fa fa-paper-plane"></i></button>
 	</div>
 
-	<div class="senderbox controls gap-sm" style="display: none;">
+	<div class="senderbox section controls gap-sm" style="display: none;">
 		<div class="curverse w3-center">
 			<h1 class="hed1">John 3:16</h1>
 			<span>current verse</span>
@@ -39,10 +39,20 @@
 			<button class="btn primary"><i class="fa fa-chevron-left"></i> previous</button>
 			<button class="btn primary">next <i class="fa fa-chevron-right"></i></button>
 		</div>
+		<button class="themebtn" onclick="sendmsg()">resend passage <i class="fa fa-paper-plane"></i></button>
 		<div>
 			<hr class="w3-border" style="color: inherit;width: min(25vw, 200px);">
 		</div>
-		<button class="themebtn" onclick="updateUI(1)"><i class="fa fa-book"></i> enter new verse</button>
+		<button class="themebtn" onclick="updateUI(1)">enter new verse <i class="fa fa-book"></i></button>
+	</div>
+
+	<div class="senderbox gap-sm">
+		<button id="showbtn" class="btn primary" onclick="showpanel()" data-shown="1" style="display: inline-flex;">show panel <i class="fa fa-eye"></i></button>
+		<button id="hidebtn" class="btn primary" onclick="hidepanel()" data-shown="0" style="display: none">hide panel <i class="fa fa-eye-slash"></i></button>
+
+		<div>
+			<input type="checkbox" id="autoshow"> <span>Auto show</span>
+		</div>
 	</div>
 
 	<script src="js/app.js"></script>
@@ -55,6 +65,7 @@
 		let nptguy = undefined;
 		let curverse = undefined;
 		let controls = undefined;
+		let autoshow = undefined;
 
 		// runtime data
 		let thebks = [];
@@ -67,10 +78,19 @@
 			nptguy = document.querySelector('#msg');
 			curverse = document.querySelector('.curverse>h1');
 			controls = document.querySelectorAll('.navbtns>.btn');
+			autoshow = document.querySelector('#autoshow');
 
 			// make UI events
 			nptguy.addEventListener('input',() => {
 				gettips();
+			})
+
+			nptguy.addEventListener('keydown',(e) => {
+				if(e !== undefined){
+					if(e.key.toLowerCase() == "enter"){
+						sendmsg();
+					}
+				}
 			})
 
 			controls[0].addEventListener('click', () => {
@@ -163,7 +183,7 @@
 
 		function updateUI(n) {
 			// switches between tab 1 and 0
-			let tabs = document.querySelectorAll('.senderbox');
+			let tabs = document.querySelectorAll('.senderbox.section');
 			let active = tabs[n];
 			let passive = tabs[(n + 1) % tabs.length];
 
@@ -243,15 +263,16 @@
 
 				if(tmp_found > 0){
 					// check if chapters are ok
-					let chaps = thebks[found_id].chapters;
+					let chaps = Number(thebks[found_id].chapters);
 					cap = plural("chapter",Number(chaps));
 					fincon = chapter <= chaps;
+					console.log(`analysing: ${fincon} = ${chapter} <= ${chaps};`)
 
 					if(fincon){
 						// check if verses are okay
-						let n = thebks[found_id].verses[chapter - 1];
-						cap = plural("verse",Number(n));
-						fincon = Number(verse) < (Number(n) + 1);
+						let n = Number(thebks[found_id].verses[chapter - 1]);
+						cap = plural("verse",(n));
+						fincon = Number(verse) < (n + 1);
 
 						console.log(`analysing verse: ${verse} <= ${n} -> ${fincon}`);
 						tip = fincon ? "" : `${book} ${chapter} has only ${n} ${cap}`;
@@ -272,19 +293,37 @@
 			return fincon;
 		}
 
+		function sendThis(type,action) {
+			let payload = `${type}->${action}`;
+			sendMessage(payload);
+		}
+
 		function sendmsg() {
 			let themsg = nptguy.value;
 
 			if(themsg != ""){
 				if(analysemsg(themsg)){
-					sendMessage();
+					sendMessage(themsg);
 					updateUI(0);
 
 					showreport();
+
+					let show = autoshow.checked == true;
+
+					if(show){
+						showpanel();
+					}
 				}
 			} else {
 				alert_danger("enter a verse first",2);
 			}
+		}
+
+		function hidepanel(){
+			sendThis('action','hide');toggleShowB('#showbtn','inline-flex','none');toggleShowB('#hidebtn','inline-flex','none');
+		}
+		function showpanel() {
+			sendThis('action','appear');toggleShowB('#hidebtn','inline-flex','none');toggleShowB('#showbtn','inline-flex','none')
 		}
 
 		// event listeners

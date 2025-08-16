@@ -8,18 +8,27 @@ socket.addEventListener('message', (event) => {
 			document.getElementById('output').textContent = event.data;
 			test_getverse(cmd);
 		} else {
+			let payld = cmd.split("->");
+			if(payld[0] == "action"){
+				let b = sceneops[payld[1]];
+
+				if(b != undefined){
+					b();
+				}
+			}
 			// alert_danger("unknown request");
 		}
 	}
 });
 
-function sendMessage() {
-	const msg = document.getElementById('msg').value;
+function sendMessage(msg) {
 	socket.send(msg);
 }
 
-function getBibleVerses(reference) {
-	const url = `https://bible-api.com/${encodeURIComponent(reference)}`;
+function getBibleVerses(reference,version) {
+	if(version == undefined)
+		version = 'kjv';
+	const url = `https://bible-api.com/${encodeURIComponent(reference)}?translation=${encodeURIComponent(version)}`;
 
 	return fetch(url)
 		.then(response => {
@@ -57,6 +66,23 @@ function test_getverse(theverse) {
 			// You can now use the `verses` array in your app
 		});
 	},timing.duration);
+}
+
+// operations
+let sceneops = {};
+sceneops['appear'] = () => {
+	bring_forth();
+}
+
+sceneops['hide'] = () => {
+	hide_panel();
+}
+
+function bring_forth() {
+	mainpanel.animate(entrance,timing);
+}
+function hide_panel() {
+	mainpanel.animate([...entrance].reverse(),timing);
 }
 
 // setTimeout(() => {test_getverse("John 3:16-17")},1000);

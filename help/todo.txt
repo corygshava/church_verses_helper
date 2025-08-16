@@ -8,3 +8,5 @@ work on the sender's page
     make it that it tells the user how many chapters and verses a book has
     make it that once a verse is sent a new panel pops up that allows one to navigate to the next chapter or the previous one
         the panel has options for `new verse`, `next verse` and `previous verse`
+
+    add a way to edit all the styles in realtime

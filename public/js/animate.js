@@ -40,3 +40,8 @@ let fadeout = [
   {opacity: 0}
 ]
 
+let entrance = [
+  {opacity: 0,"transform": "rotateX(-30deg) translateX(-300px) skewX(-30deg)",},
+  {opacity: 1,"transform": "rotateX(0deg) translateX(0px) skewX(0deg)",}
+]
+
