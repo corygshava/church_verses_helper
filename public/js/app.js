@@ -1,3 +1,7 @@
+// runtime data
+let default_font = 6.7;
+let curscale = 1.0;
+
 const socket = new WebSocket(`ws://${window.location.host}`);
 
 socket.addEventListener('message', (event) => {
@@ -76,6 +80,17 @@ sceneops['appear'] = () => {
 
 sceneops['hide'] = () => {
 	hide_panel();
+}
+sceneops['sizeup'] = () => {
+	curscale += 0.1;
+	gottenverse.style.fontSize = `${default_font * curscale}rem`;
+	console.log("upscale")
+}
+sceneops['sizedown'] = () => {
+	curscale -= 0.1;
+	gottenverse.style.fontSize = `${default_font * curscale}rem`;
+	console.log("downscale")
+
 }
 
 function bring_forth() {

@@ -17,6 +17,13 @@
 	<script src="js/animate.js"></script>
 </head>
 <body>
+	<div class="w3-block spacy-sm themebg">
+		<a href="javascript:history.back()"><i class="fa fa-chevron-left"></i> back</a>
+	</div>
+	<header class="spacy-md w3-center w3-black">
+		<h2 class="h2">Display Remote</h2>
+		<p>this controls the verse display screen</p>
+	</header>
 	<div class="senderbox section w3-center">
 		<h1>Send a verse</h1>
 		<span class="tiptxt">--</span>
@@ -70,6 +77,8 @@
 		// runtime data
 		let thebks = [];
 		let curversedata = {}
+
+		let panelsshown = false;
 
 		// UI ops
 		function initUIs() {
@@ -320,16 +329,59 @@
 		}
 
 		function hidepanel(){
-			sendThis('action','hide');toggleShowB('#showbtn','inline-flex','none');toggleShowB('#hidebtn','inline-flex','none');
+			panelsshown = false;
+			sendThis('action','hide');
+			toggleShowB('#showbtn','inline-flex','none');
+			toggleShowB('#hidebtn','inline-flex','none');
 		}
 		function showpanel() {
-			sendThis('action','appear');toggleShowB('#hidebtn','inline-flex','none');toggleShowB('#showbtn','inline-flex','none')
+			panelsshown = true;
+			sendThis('action','appear');
+			toggleShowB('#hidebtn','inline-flex','none');
+			toggleShowB('#showbtn','inline-flex','none')
 		}
 
 		// event listeners
 		window.addEventListener('load',() => {
 			initUIs();
 			loadbibleverses();
+		})
+
+		// keyboard shortcuts
+		window.addEventListener('keydown',e => {
+			if(e.altKey){
+				// disables default behavour unless shift is included in the command
+				if(!e.shiftKey){
+					e.preventDefault();
+				}
+
+				if(e.key.toLowerCase() == "s"){
+					if(panelsshown)
+						hidepanel();
+					else
+						showpanel();
+				}
+				if(e.key.toLowerCase() == "arrowup"){
+					sendThis('action','sizeup');
+				}
+				if(e.key.toLowerCase() == "arrowdown"){
+					sendThis('action','sizedown');
+				}
+				if(e.key.toLowerCase() == "arrowleft"){
+					getnext_passage(-1);
+				}
+				if(e.key.toLowerCase() == "arrowright"){
+					getnext_passage(1);
+				}
+				if(e.key.toLowerCase() == "r"){
+					sendmsg();
+				}
+				if(e.key.toLowerCase() == "d"){
+					updateUI(1);
+				}
+			}
+
+			// console.log(e)
 		})
 	</script>
 </body>
