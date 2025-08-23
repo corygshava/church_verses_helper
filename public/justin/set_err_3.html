@@ -353,13 +353,12 @@
 
 	<!-- External WS stub (you own this file) -->
 	<script src="js/app.js"></script>
+	<script src="js/SuperScript.js"></script>
+	<script src="js/toappend.js"></script>
+	<script src="js/customalerter.js"></script>
 
 	<!-- App logic -->
 	<script>
-		// utility variables
-		let endpoint_getscenes = "/api_getscenes";
-		let endpoint_getimages = "/api_getimages";
-
 	/* =======================
 		 State + Utilities
 	======================= */
@@ -420,7 +419,6 @@
 				console.log(data.echo);
 				// thescenes = Array.isArray(data.echo) ? normalizeScenes(data.echo) : [defaultScene()];
 				thescenes = normalizeScenes([data.echo]);
-				// thescenes.push(data.echo);
 			} else {
 				thescenes = [defaultScene()];
 			}
@@ -737,8 +735,10 @@
 
 	/* ===== property factory helpers ===== */
 	function propText(label, key, val) {
-		const d = document.createElement("div"); d.className = "prop";
-		d.innerHTML = `<label>${label}</label><input type="text" data-key="${key}" value="${val ?? ""}">`; return d;
+		const d = document.createElement("div");
+		d.className = "prop";
+		d.innerHTML = `<label>${label}</label><input type="text" data-key="${key}" value="${val ?? ""}">`;
+		return d;
 	}
 	function propNum(label, key, val, min, max, step=1) {
 		const d = document.createElement("div"); d.className = "prop";
@@ -818,7 +818,7 @@
 			const f = up.files?.[0]; if (!f) return;
 			const fd = new FormData(); fd.append("file", f);
 			try {
-				const res = await fetch("/api_uploadimg", { method: "POST", body: fd });
+				const res = await fetch(endpoint_sendimages, { method: "POST", body: fd });
 				const data = await res.json();
 				if (data?.success) {
 					const src = data.echo; // new path
@@ -872,8 +872,15 @@
 	$("#sceneSwitcher").addEventListener("change", e => setActiveScene(e.target.value));
 	$("#btnNewScene").onclick = () => {
 		const s = defaultScene();
-		s.scenename = prompt("Scene name:", "New Scene") || ("Scene " + (thescenes.length+1));
-		thescenes.push(s); setActiveScene(s.id); saveLocalScenes();
+		s.scenename = prompt("Scene name:", "Scene " + (thescenes.length));
+
+		if(s.scenename){
+			thescenes.push(s);
+			setActiveScene(s.id);
+			saveLocalScenes();
+		} else {
+			alert_dark('scene creation aborted');
+		}
 	};
 	$("#btnDupScene").onclick = () => {
 		const c = structuredClone(activeScene);
@@ -963,78 +970,34 @@
 		 Send payload (API + WS)
 	======================= */
 	$("#sendPayload").onclick = async () => {
-		const payload = buildPayload(activeScene);
+		const payload = activeScene;
 		setApiStatus("sending");
+
 		try {
-			const res = await fetch("/api_stylesmanager", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload) });
+			const res = await fetch(
+				endpoint_sendstyles, 
+				{ method:"POST", headers:{"Content-Type":"application/json"}, 
+				body: JSON.stringify(payload) }
+			);
+
 			const data = await res.json();
+
 			if (!data?.success) throw new Error(data?.echo || "Server error");
 			setApiStatus("ok");
+			alert_success('successfully updated');
 		} catch (e) {
-			console.error(e); setApiStatus("error");
+			console.error(e);
+			setApiStatus("error");
+			alert_danger(`error sending payload : ${e}`)
 		}
 		// WS broadcast (uses external js/app.js)
-		try { sendMessage("action:regetstyles"); } catch { /* ignore */ }
+		try {
+			sendMessage("action->regetstyles");
+			alert_success('successfully synced',2);
+		} catch(e) {
+			alert_danger(`error syncing: ${e}`);
+		}
 	};
-
-	function buildPayload(scene) {
-		/*const texts = scene.myelements.filter(x => x.mytype==="text");
-		const bg = scene.myelements.find(x => x.mytype==="background");
-		const slide = scene.myelements.find(x => x.mytype==="slide");
-
-		const txtstyles = {};
-		// two primary text slots mapped to gottenverse + output
-		if (texts[0]) {
-			const s = texts[0].styles || {};
-			txtstyles.txt_color_1 = s.color;
-			txtstyles.txt_fontweight_1 = String(s.fontWeight);
-			txtstyles.txt_outline_1 = s.outlineColor;
-			txtstyles.txt_outlinewidth_1 = String(s.outlineWidth);
-			txtstyles.txt_size_1 = String(s.fontSize);
-			txtstyles.txt_font_1 = s.fontFamily;
-			txtstyles.txt_text_1 = texts[0].demotext || "";
-		}
-		if (texts[1]) {
-			const s = texts[1].styles || {};
-			txtstyles.txt_color_2 = s.color;
-			txtstyles.txt_fontweight_2 = String(s.fontWeight);
-			txtstyles.txt_outline_2 = s.outlineColor;
-			txtstyles.txt_outlinewidth_2 = String(s.outlineWidth);
-			txtstyles.txt_size_2 = String(s.fontSize);
-			txtstyles.txt_font_2 = s.fontFamily;
-			txtstyles.txt_text_2 = texts[1].demotext || "";
-		}
-
-		const bgstyles = { bg_style: bg?.styles?.style || "plain", bgdata: {} };
-		if (bg) {
-			const s = bg.styles || {};
-			if (s.style === "plain") {
-				bgstyles.bgdata.bg_d_color = s.color;
-			} else if (s.style === "gradient") {
-				bgstyles.bgdata.bg_d_type = s.gradient?.type || "linear";
-				bgstyles.bgdata.bg_d_angle = String(s.gradient?.angle ?? 135);
-				bgstyles.bgdata.bg_d_colors = s.gradient?.colors || [];
-			} else if (s.style === "image") {
-				bgstyles.bgdata.bg_d_src = s.image?.src || "";
-				bgstyles.bgdata.bg_d_size = s.image?.size || "cover";
-				bgstyles.bgdata.bg_d_attachment = s.image?.attachment || "scroll";
-			}
-		}
-
-		const slidestyles = {};
-		if (slide) {
-			slidestyles.slide_enter = slide.styles?.enter?.name || "fadeIn";
-			slidestyles.slide_enter_duration = slide.styles?.enter?.duration || "600ms";
-			slidestyles.slide_enter_easing = slide.styles?.enter?.easing || "ease-out";
-			slidestyles.slide_exit = slide.styles?.exit?.name || "fadeOut";
-			slidestyles.slide_exit_duration = slide.styles?.exit?.duration || "600ms";
-			slidestyles.slide_exit_easing = slide.styles?.exit?.easing || "ease-in";
-		}
-
-		return { scene: scene.scenename, txtstyles, bgstyles, slidestyles };*/
-
-		return scene;
-	}
 
 	/* =======================
 		 Autosave + runtime

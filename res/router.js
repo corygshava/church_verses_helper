@@ -10,7 +10,7 @@ async function handlereq(path,body, callback){
 		await savepayload(JSON.stringify(body,null,4),'./databank/stylesdata.json');
 		res = {success: true,echo: "data saved successgully"};
 	} else if(path === '/api_getscenes') {
-		console.log("body",JSON.stringify(body));
+		// console.log("body",JSON.stringify(body,null,4));
 		let dta = await readMyData('./databank/stylesdata.json');
 		res = {success:true,echo: dta}
 	}

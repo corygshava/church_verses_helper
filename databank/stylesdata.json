@@ -35,12 +35,12 @@
             "demotext": "",
             "styles": {
                 "style": "gradient",
-                "color": "#0d1423",
+                "color": "#205cdf",
                 "gradient": {
                     "type": "linear",
                     "colors": [
-                        "#0045db",
-                        "#000552"
+                        "#00a1e6",
+                        "#00188f"
                     ],
                     "angle": 135
                 },
@@ -56,12 +56,12 @@
             "mytype": "slide",
             "styles": {
                 "enter": {
-                    "name": "fadeIn",
+                    "name": "slideIn",
                     "duration": "600ms",
                     "easing": "ease-out"
                 },
                 "exit": {
-                    "name": "fadeOut",
+                    "name": "zoomOut",
                     "duration": "600ms",
                     "easing": "ease-in"
                 }

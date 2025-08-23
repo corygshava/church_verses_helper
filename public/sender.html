@@ -79,6 +79,7 @@
 		let curversedata = {}
 
 		let panelsshown = false;
+		let hostshown = false;
 
 		// UI ops
 		function initUIs() {
@@ -341,6 +342,18 @@
 			toggleShowB('#showbtn','inline-flex','none')
 		}
 
+		function togglehostpanel() {
+			if(!hostshown){
+				alert_dark('showing lowerthird');
+				sendThis('action','showthird');
+			} else {
+				alert_dark('hiding lowerthird');
+				sendThis('action','hidethird');
+			}
+
+			hostshown = !hostshown;
+		}
+
 		// event listeners
 		window.addEventListener('load',() => {
 			initUIs();
@@ -378,6 +391,9 @@
 				}
 				if(e.key.toLowerCase() == "d"){
 					updateUI(1);
+				}
+				if(e.key.toLowerCase() == "a"){
+					togglehostpanel();
 				}
 			}
 

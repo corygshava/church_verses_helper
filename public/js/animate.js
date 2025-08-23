@@ -45,3 +45,12 @@ let entrance = [
   {opacity: 1,"transform": "rotateX(0deg) translateX(0px) skewX(0deg)",}
 ]
 
+let frames_slatein = [
+  {opacity: 0,translate: "-20px 0"},
+  {opacity: 1,translate: "0 0"}
+]
+
+let frames_spacen = [
+  {opacity: 0,letterSpacing: "0"},
+  {opacity: 1,letterSpacing: "7px"}
+]

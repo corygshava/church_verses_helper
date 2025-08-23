@@ -1,11 +1,19 @@
+// API endpoint variables
+	let endpoint_getscenes = "/api_getscenes";
+	let endpoint_getimages = "/api_getimages";
+	let endpoint_sendimages = "/api_uploadimg";
+	let endpoint_sendstyles = "/api_stylesmanager";
+
 // runtime data
-let default_font = 6.7;
-let curscale = 1.0;
+	let default_font = 6.7;
+	let curscale = 1.0;
+	let curstyles_viewer = {};
 
 const socket = new WebSocket(`ws://${window.location.host}`);
 
 socket.addEventListener('message', (event) => {
 	if (window.location.pathname.endsWith('receiver.html')) {
+		// in case you are in the receiver page
 		let cmd = event.data;
 
 		if(cmd.includes(":")){
@@ -90,8 +98,37 @@ sceneops['sizedown'] = () => {
 	curscale -= 0.1;
 	gottenverse.style.fontSize = `${default_font * curscale}rem`;
 	console.log("downscale")
-
 }
+sceneops['regetstyles'] = async (s) => {
+	s = s == undefined ? false : s;
+
+	if(!s){
+		alert_warning('reloading styles');
+	}
+
+	try{
+		let req = await fetch(endpoint_getscenes);
+		let theres = await req.json();
+
+		// console.log(theres);
+
+		if(!theres.success){
+			throw new Error(theres.echo);
+		}
+
+		curstyles_viewer = theres.echo;
+		reset_styles(s);
+	} catch (e){
+		alert_danger(`error: ${e}`);
+	}
+}
+sceneops['showthird'] = () => {
+	showhostinfo();
+}
+sceneops['hidethird'] = () => {
+	hidehostinfo();
+}
+
 
 function bring_forth() {
 	mainpanel.animate(entrance,timing);

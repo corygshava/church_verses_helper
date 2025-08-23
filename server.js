@@ -27,7 +27,7 @@ app.use((req, res, next) => {
             res.json(m);
         })
         .then((rr) => {
-            console.log(`[${callid} | ${req.path}] -> done with API call -> ${JSON.stringify(rr)}`);
+            console.log(`[${callid} | ${req.path}] -> done with API call -> ${/*JSON.stringify(rr)*/"we good!"}`);
         })
     }
 })

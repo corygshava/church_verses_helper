@@ -1,0 +1,19 @@
+/* holds all the fonts locally to reduce load times */
+@font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins-Regular.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Popp';
+    src: url('../fonts/Poppins-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Raleway';
+    src: url('../fonts/Raleway.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'AllerDis';
+    src: url('../fonts/ze_unvet_NEXT ART_Heavy.otf') format('opentype');
+}
