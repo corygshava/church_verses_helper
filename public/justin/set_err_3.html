@@ -325,7 +325,7 @@
 			<div class="stat">Autosave: <strong id="statSave" style="margin-left:6px;">idle</strong></div>
 		</div>
 		<div>
-			<button class="btn-primary" id="sendPayload" style="margin-top:auto;">Save changes</button>
+			<button class="btn-primary" id="sendPayload" style="margin-top:auto;">Make active theme</button>
 			<div class="stat" id="apiStatus">API: <strong style="margin-left:6px;">idle</strong></div>
 			<div class="stat">WS: <strong id="wsState" style="margin-left:6px;">disconnected</strong></div>
 		</div>
@@ -356,6 +356,10 @@
 
 	<!-- App logic -->
 	<script>
+		// utility variables
+		let endpoint_getscenes = "/api_getscenes";
+		let endpoint_getimages = "/api_getimages";
+
 	/* =======================
 		 State + Utilities
 	======================= */
@@ -404,13 +408,19 @@
 	/* =======================
 		 Persistence + Fetch
 	======================= */
+
 	async function fetchScenes() {
 		setApiStatus("loading");
+
 		try {
-			const res = await fetch("/api_getscenes");
+			const res = await fetch(endpoint_getscenes);
 			const data = await res.json();
+
 			if (data?.success) {
-				thescenes = Array.isArray(data.echo) ? normalizeScenes(data.echo) : [defaultScene()];
+				console.log(data.echo);
+				// thescenes = Array.isArray(data.echo) ? normalizeScenes(data.echo) : [defaultScene()];
+				thescenes = normalizeScenes([data.echo]);
+				// thescenes.push(data.echo);
 			} else {
 				thescenes = [defaultScene()];
 			}
@@ -783,7 +793,7 @@
 		async function loadImages() {
 			grid.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);">Loading...</div>`;
 			try {
-				const res = await fetch("/api_getimages");
+				const res = await fetch(endpoint_getimages);
 				const data = await res.json();
 				const list = (data?.success && Array.isArray(data.echo)) ? data.echo : [];
 				grid.innerHTML = "";
@@ -964,11 +974,11 @@
 			console.error(e); setApiStatus("error");
 		}
 		// WS broadcast (uses external js/app.js)
-		try { sendMessage(payload); } catch { /* ignore */ }
+		try { sendMessage("action:regetstyles"); } catch { /* ignore */ }
 	};
 
 	function buildPayload(scene) {
-		const texts = scene.myelements.filter(x => x.mytype==="text");
+		/*const texts = scene.myelements.filter(x => x.mytype==="text");
 		const bg = scene.myelements.find(x => x.mytype==="background");
 		const slide = scene.myelements.find(x => x.mytype==="slide");
 
@@ -1021,7 +1031,9 @@
 			slidestyles.slide_exit_easing = slide.styles?.exit?.easing || "ease-in";
 		}
 
-		return { scene: scene.scenename, txtstyles, bgstyles, slidestyles };
+		return { scene: scene.scenename, txtstyles, bgstyles, slidestyles };*/
+
+		return scene;
 	}
 
 	/* =======================
@@ -1048,12 +1060,35 @@
 	/* =======================
 		 WS runtime indicator (reads from external js/app.js)
 	======================= */
+
 	const wsStateEl = $("#wsState");
+
 	function bindWsState() {
-		if (typeof socket === "undefined" || !socket) { wsStateEl.textContent = "disconnected"; return; }
-		const set = () => wsStateEl.textContent = (socket.readyState===1) ? "connected" :
-																							(socket.readyState===0) ? "connecting" :
-																							(socket.readyState===2) ? "closing" : "closed";
+		if (typeof socket === "undefined" || !socket){
+			wsStateEl.textContent = "disconnected";
+			return;
+		}
+
+		const set = () => {
+			let outxt = "";
+
+			switch(socket.readyState){
+				case 0:
+					outxt = "connecting";
+					break;
+				case 1:
+					outxt = "connected";
+					break;
+				case 2:
+					outxt = "closing";
+					break;
+				default:
+					outxt = "closed";
+					break;
+			}
+			wsStateEl.textContent = outxt;
+		};
+
 		set();
 		socket.addEventListener?.("open", set);
 		socket.addEventListener?.("close", set);

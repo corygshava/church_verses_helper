@@ -21,6 +21,7 @@ app.use((req, res, next) => {
 
     if(req.path.startsWith("/api_")){
         console.log(`[${callid} | ${req.path}] -> API attempt detected!`);
+        // console.log(req.body);
 
         router.handlereq(req.originalUrl,req.body,(m) => {
             res.json(m);
