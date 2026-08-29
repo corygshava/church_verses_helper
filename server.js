@@ -9,6 +9,7 @@ const router = require('./res/router.js')
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+const portno = 55771;
 
 // Serve static files
 app.use(express.static('public'));
@@ -29,13 +30,20 @@ app.use((req, res, next) => {
         .then((rr) => {
             console.log(`[${callid} | ${req.path}] -> done with API call -> ${/*JSON.stringify(rr)*/"we good!"}`);
         })
+    } else {
+        console.log(`[${callid} | ${req.path}] -> Calling static asset!`);
     }
 })
 
 // create a websocket listener
 wss.on('connection', (ws) => {
+    let callid = "SOC_" + Number(Math.random().toFixed(7).toString().replaceAll("0.","")).toString(30);
+    console.log(`[${callid}] -> Connection established!`);
+
     ws.on('message', (message) => {
         // Broadcast message to all clients
+        console.log(`[${callid}] -> Message recieved!`);
+
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(message.toString());
@@ -44,4 +52,4 @@ wss.on('connection', (ws) => {
     });
 });
 
-server.listen(3000, () => console.log('Server running on http://localhost:3000'));
+server.listen(portno, () => console.log(`Server running on http://localhost:${portno}`));

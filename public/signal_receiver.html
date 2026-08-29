@@ -50,6 +50,32 @@
 			background: var(--textcolor);
 			display: block;
 		}
+
+		/* HTML: <div class="loader"></div> */
+		.loader {
+			width: 70px;
+			height: 26px;
+			background: #3FD97F;
+			--c:no-repeat linear-gradient(#000 0 0);
+			--s:18px 18px;
+			-webkit-mask:
+				var(--c) left  4px top 50%,
+				var(--c) center,
+				var(--c) right 4px top 50%,
+				linear-gradient(#000 0 0);
+			-webkit-mask-composite:xor;
+							mask-composite:exclude;
+			animation: l2 1.5s infinite;
+		}
+		@keyframes l2 {
+			0%    {-webkit-mask-size:0    0  ,0    0  ,0    0  ,auto}
+			16.67%{-webkit-mask-size:var(--s),0    0  ,0    0  ,auto}
+			33.33%{-webkit-mask-size:var(--s),var(--s),0    0  ,auto}
+			50%   {-webkit-mask-size:var(--s),var(--s),var(--s),auto}
+			66.67%{-webkit-mask-size:0    0  ,var(--s),var(--s),auto}
+			83.33%{-webkit-mask-size:0    0  ,0    0  ,var(--s),auto}
+			100%  {-webkit-mask-size:0    0  ,0    0  ,0    0  ,auto}
+		}
 	</style>
 </head>
 <body class="">
@@ -96,12 +122,19 @@
 		// functions specific to signal_receiver --------------------------------
 
 		function hideverseguy(){
-			passage.animate(fadeout,timing);
+			// passage.animate(fadeout,timing);
+			passage.innerHTML = `
+				<div class="spacy-sm flow center gap-sm">
+					<div>
+						<div class="loader"></div>
+					</div>
+				</div>
+			`;
 		}	
 
 		function showverseguy(){
 			autoResizeText(passage,versedisplay,16,102,() => {alert_warning("text overflow")})
-			passage.animate(slidein,timing);
+			passage.animate(slidein,{...timing,delay: 0});
 		}
 
 		function reset_styles(s) {
@@ -186,10 +219,13 @@
 			mytimes.duration = 700;
 			mytimes.delay += 400;
 			ui_topictxt.animate([...entrance].reverse(),mytimes);
+
 			mytimes.delay += 70;
 			ui_theline.animate([...entrance].reverse(),mytimes);
+
 			mytimes.delay += 70;
 			ui_speakertxt.animate([...frames_spacen].reverse(),mytimes);
+
 			ui_thrd.animate([...frames_slatein].reverse(),mytimes);
 		}
 

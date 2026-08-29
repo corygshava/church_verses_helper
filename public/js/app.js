@@ -16,7 +16,7 @@ socket.addEventListener('message', (event) => {
 		// in case you are in the receiver page
 		let cmd = event.data;
 
-		if(cmd.includes(":")){
+		if(cmd.includes(":") && !(cmd.includes("{"))){
 			document.getElementById('output').textContent = event.data;
 			test_getverse(cmd);
 		} else {
@@ -24,11 +24,19 @@ socket.addEventListener('message', (event) => {
 			if(payld[0] == "action"){
 				let b = sceneops[payld[1]];
 
-				if(b != undefined){
+				if(b != undefined && typeof b == 'function'){
 					b();
 				}
+			} else if(payld[0] == "data"){
+				let datagram = payld[1].split('|||');
+				let b = dataops[datagram[0]]
+
+				if(b != undefined && typeof b == 'function'){
+					b(datagram[1]);
+				} else {
+					alert_danger("unknown data request");
+				}
 			}
-			// alert_danger("unknown request");
 		}
 	}
 });
@@ -38,8 +46,10 @@ function sendMessage(msg) {
 }
 
 function getBibleVerses(reference,version) {
-	if(version == undefined)
+	if(version == undefined){
 		version = 'kjv';
+	}
+
 	const url = `https://bible-api.com/${encodeURIComponent(reference)}?translation=${encodeURIComponent(version)}`;
 
 	return fetch(url)
@@ -64,7 +74,7 @@ function getBibleVerses(reference,version) {
 		});
 }
 
-// ✅ Example Usage:
+// Example Usage:
 function test_getverse(theverse) {
 	hideverseguy();
 
@@ -127,6 +137,14 @@ sceneops['showthird'] = () => {
 }
 sceneops['hidethird'] = () => {
 	hidehostinfo();
+}
+
+let dataops = {};
+dataops['set_speaker'] = (d) => {
+	let dta = JSON.parse(d);
+
+	thetopic.innerHTML = `${dta.s_topic}`;
+	thespeaker.innerHTML = `by ${dta.s_title} ${dta.s_name}`;
 }
 
 

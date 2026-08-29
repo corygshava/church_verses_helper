@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"content="width=device-width,initial-scale=1">
+	<title>Remote</title>
+	<script src="js/animate.js"></script>
+	
+	<link rel="stylesheet" href="./cbl/_assets/_vendor/BS4/css/bootstrap.min.css">
+	<link rel="stylesheet" href="./cbl/_assets/css/fa-all.css">
+	<link rel="stylesheet" href="./cbl/_assets/css/w3.css">
+	<link rel="stylesheet" href="./cbl/_assets/css/coryG_UIOps.css">
+	<link rel="stylesheet" href="./cbl/_assets/css/coryG_base.css">
+	<link rel="stylesheet" href="./cbl/_assets/css/fonts.css">
+	<link rel="stylesheet" href="./cbl/_assets/css/animate.css">
+	<link rel="stylesheet" href="./cbl/_assets/css/mediaoptima.css">
+	
+	<link rel="stylesheet" type="text/css" href="./cbl/_assets/css/inter_slop.css">
+	<!-- <link rel="stylesheet" type="text/css" href="./cbl/_assets/css/kimi_slop.css"> -->
+	
+	<script src="./cbl/_assets/_vendor/misc/jquery-3.6.0.min.js"></script>
+	<script src="./cbl/_assets/_vendor/misc/popper.min.js"></script>
+	<script src="./cbl/_assets/_vendor/misc/qrcode.min.js"></script>
+	<!-- <script src="./cbl/_assets/js/chart.js"></script> -->
+	<script src="./cbl/_assets/js/SuperScript.js"></script>
+	<script src="./cbl/_assets/js/toappend.js"></script>
+
+	<script src="./cbl/_assets/_vendor/BS4/js/bootstrap.bundle.min.js"></script>
+	
+	<!-- <script src="./cbl/_assets/js/anims.js"></script> -->
+	<script src="./cbl/_assets/js/coryG_UIOps.js"></script>
+	<script src="./cbl/_assets/js/customalerter.js"></script>
+	<script src="./cbl/_assets/js/super_encryptor.js"></script>
+	<script src="./cbl/_assets/js/app.js"></script>
+
+	<!-- locals -->
+	<script src="js/app.js"></script>
+	<script src="js/biblebooks.js"></script>
+
+	<style>
+		/* .mybtn{background-color: var(--clr-panelbg);} */
+		.verse_type_area{
+			width: 100%;
+			max-width: 700px;
+			display: flex;
+			gap:0;
+			border: 1px solid var(--clr-border);
+			border-radius: var(--roundness);
+			overflow: hidden;
+		}
+		.verse_type_area input{
+			flex: 1;
+			padding: 12px 16px;
+			border: 1px solid transparent;
+		}
+		.verse_type_area input:focus{
+			outline: none;
+		}
+		.verse_type_area button{
+			border: none;
+			flex: 0 1 120px;
+		}
+		.verse_type_area:has(input:focus){
+			border: 1px solid var(--themecolor);
+		}
+		.verse_type_area:has(input:focus) button{
+			background-color: var(--themecolor);
+			color: #fff;
+		}
+
+		.booksHelper .taglist{
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+		}
+		.booksHelper .taglist .item{
+			padding: 12px 16px;
+			font-size: 1.2rem;
+			border: 1px solid var(--clr-border);
+			border-radius: var(--roundness);
+			cursor: pointer;
+			/*flex: 1 0 auto;*/
+		}
+		.booksHelper .taglist .item:hover{
+			border: 1px solid var(--themecolor);
+			color: var(--themecolor);
+		}
+
+		.cur_heading{
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			text-transform: uppercase;
+			letter-spacing: 2px;
+			padding: 12px;
+			color: var(--clr-text-muted);
+			font-weight: 800;
+		}
+		.curverse{
+			font-weight: 700;
+			text-transform: capitalize;
+		}
+
+		.tabsguy>.tab{
+			max-width: 1280px;
+			margin: 0 auto;
+		}
+		.tab{
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			gap: 0;
+		}
+		.tab .inner_guy{
+			flex: 1 1 700px;
+			max-height: 98vh;
+			padding: 16px 0;
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+		.tab .divider{
+			flex: 0 0 1px;
+			background-color: var(--clr-border);
+		}
+		.tab .sidemenu{
+			flex: 1;
+		}
+		.upbtn{display: none !important;}
+	</style>
+</head>
+<body data-mode="dark">
+	<div class="w3-bottom spacy-md flowline gap-sm left" style="z-index: 3;width:auto;">
+		<button class="circle_btn" data-myclass="circle_btn" data-runme="toggle_ui_mode" id="mode_indicator"><i class="fa fa-circle-notch"></i></button>
+	</div>
+
+	<div class="tabsguy">
+		<div class="tab pick_verse">
+			<div class="inner_guy spacy-sm">
+				<div class="input_section flow center spacy-tn">
+					<h1 id="announce">Pick a verse</h1>
+					<span class="tiptxt">--</span>
+
+					<form class="verse_type_area w3-red" data-onsubmit="try_send_msg" data-blockdefault="yes">
+						<input id="verseInput" placeholder="enter bible verse here..." list="bookslist_" />
+						<datalist id="bookslist">
+							<option value="Matthew"></option>
+							<option value="Mark"></option>
+							<option value="Luke"></option>
+							<option value="John"></option>
+						</datalist>
+						<button type="submit" class="act_btn">Send <i class="fa fa-paper-plane"></i></button>
+					</form>
+				</div>
+
+				<div class="booksHelper slide-up" data-subrole="book">
+					<div class="cur_heading" data-subrole="announce"><b>Books</b></div>
+					<div class="taglist" data-role="shared_display">
+						<div class="item" data-runme="set_book" data-mybook="Genesis">Genesis</div>
+					</div>
+				</div>
+
+				<div class="w3-hide slide-up flow center" data-subrole="project_options">
+					<div class="curverse"><h1>2 Curverse 2:23</h1></div>
+					<div class="cur_heading"><b>Options</b></div>
+					
+					<div class="the_options flow gap-tn">
+						<div class="flowline gap-sm btn_controls">
+							<button class="mybtn themehover" data-runme="getnext_verse" data-offset="-1"><i class="fa fa-chevron-left"></i> previous</button>
+							<button class="mybtn themehover" data-runme="getnext_verse" data-offset="1">next <i class="fa fa-chevron-right"></i></button>
+						</div>
+						<button class="mybtn themehover in_fullwidth" data-runme="try_send_msg" data-con="false"><i class="fa fa-sync-alt"></i> resend</button>
+						<button class="mybtn themehover in_fullwidth" data-runme="toggle_projector_options" data-con="false"><i class="fa fa-book"></i> pick another</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="divider" data-visibledata="0,0,1"></div>
+
+			<div class="sidemenu spacy-sm">
+				<h2 class="w3-center my-4">Toolbar</h2>
+				<div class="flow gap-tn">
+					<button class="mybtn primary in_fullwidth" onclick="toggleversepanel(this)" id="panel_toggler">
+						<i class="fa fa-desktop"></i> toggle panel <span class="state"></span>
+					</button>
+					<button class="mybtn primary in_fullwidth" onclick="togglehostpanel(this)" id="title_toggler">
+						<i class="fa fa-poll-h"></i> toggle Title <span class="state"></span>
+					</button>
+
+					<hr>
+
+					<div class="flowline gap-tn">
+						<button class="mybtn outline" style="flex: 1;" data-runme="adjust_size" data-offset="1">
+							<i class="fa fa-plus"></i> text size
+						</button>
+						<button class="mybtn outline" style="flex: 1;" data-runme="adjust_size" data-offset="-1">
+							<i class="fa fa-minus"></i> text size
+						</button>
+					</div>
+
+					<hr>
+
+					<button class="mybtn outline in_fullwidth" onclick="changehostdetails()" id="deets_changer">
+						<i class="fa fa-edit"></i> change speaker details <span class="state"></span>
+					</button>
+					<button class="mybtn outline in_fullwidth" data-runme="send_speaker_details" id="deets_resender">
+						<i class="fa fa-user-tie"></i> resend speaker details <span class="state"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// UIs
+		let bkslist = undefined;
+		let tipguy = undefined;
+		let nptguy = undefined;
+		let curverse = undefined;
+		let controls = undefined;
+		let autoshow = undefined;
+
+		let shared_dis = undefined;
+		let books_UI = undefined;
+		let options_UI = undefined;
+
+		// runtime data
+		let thebks = [];
+		let curversedata = {
+			book: undefined,
+			chapter: undefined,
+			verse: undefined,
+		};
+		let speaker_deets = {};
+
+		let panelsshown = false;
+		let hostshown = false;
+
+		// UI ops
+			function initUIs() {
+				bkslist = document.querySelector('#bookslist');
+				tipguy = document.querySelector('.tiptxt');
+				nptguy = document.querySelector('#verseInput');
+				curverse = document.querySelector('.curverse>h1');
+				controls = document.querySelectorAll('.btn_controls>button');
+				autoshow = document.querySelector('#autoshow');
+
+				shared_dis = document.querySelector('[data-role="shared_display"]');
+				books_UI = document.querySelector('[data-subrole="book"]');
+				options_UI = document.querySelector('[data-subrole="project_options"]');
+
+				// make UI events
+				nptguy.addEventListener('input',(n) => {
+					// console.log('input arg',n);
+					if(curversedata.book == undefined){
+						filterbooks_ui(n.target.value);
+					}
+					gettips();
+				})
+
+				nptguy.addEventListener('keydown',(e) => {
+					if(e !== undefined){
+						if(e.key.toLowerCase() == "enter"){
+							sendmsg();
+						}
+					}
+				})
+
+				/*
+					// disable controls for now
+					controls[0].addEventListener('click', () => {
+						getnext_passage(-1);
+					})
+
+					controls[1].addEventListener('click', () => {
+						getnext_passage(1);
+					})
+				// */
+
+				// render the books
+				render_these(null,'books');
+			}
+			function loadbibleverses() {
+				bkslist.innerHTML = "";
+
+				thebks = getallbooks();
+
+				thebks.forEach(el => {
+					let opt = `<option value="${el.name}"></option>`;
+					bkslist.innerHTML += opt;
+				})
+			}
+			function gettips() {
+				let tip = "start typing to get tips";
+				let txt = nptguy.value.toLowerCase().trim();
+				let conti = true;
+
+				if(txt != ""){
+					if(!txt.includes(":")){
+						// no chapter yet validate the book
+						// remove any numbers but dont remove the prefix ones
+						txt = txt.replace(/(?<=\b)(?!^\d)\d+/g, '').trim();
+						// console.log("post processed: " + txt)
+
+						// see if the book is in the list provided no chapter was entered yet
+
+						let thebook = findbook(txt);
+						if(thebook != undefined){
+							curversedata.book = thebook.name;
+							let tmp_chaps = thebook.chapters;
+							let cap = plural("chapter",Number(tmp_chaps));
+							tip = `${txt} has ${tmp_chaps} ${cap}`;
+						} else {
+							tip = `<b>${txt}</b> is not a valid book`;
+						}
+					} else {
+						// has a chapter or verse combo
+						let hay = txt.split(" ");
+						let versepart = hay.pop().split(":");
+						let needle = versepart[0];
+						let book = hay.join(" ");
+						let n = undefined;
+
+						let thebook = findbook(book);
+						curversedata.book = thebook.name;
+						curversedata.chapter = needle;
+
+						if(versepart.length > 1){
+							curversedata.verse = Number(versepart[1].split('-')[0].trim());
+						}
+
+						if(thebook != undefined){
+							n = thebook.verses[needle - 1];
+							if(n != undefined){
+								let cap = plural("verse",Number(n));
+								tip = `${book} ${needle} has ${n} ${cap}`;
+							} else {
+								tip = "that chapter doesnt exist";
+							}
+						} else {
+							tip = `<b>${txt}</b> is not a valid book`;
+						}
+
+					}
+				}
+
+				tipguy.innerHTML = `<i>${tip}</i>`;
+				// updateRelevantos();
+			}
+			function updateUI(n) {
+				// switches between tab 1 and 0
+				let tabs = document.querySelectorAll('.senderbox.section');
+				let active = tabs[n];
+				let passive = tabs[(n + 1) % tabs.length];
+
+				active.animate(slideout,{...timing});
+
+				setTimeout(() => {
+					// hide active
+					active.style.display = "none";
+					// animatein passive
+					passive.animate(hideme,{...timing,duration: 100});
+					passive.style.display = "flex";
+					passive.style.display = "flex";
+					passive.animate(slidein,{...timing,delay: 100});
+				},timing.duration)
+			}
+			function showreport(){
+				let cd = curversedata;
+				let passage = `${cd.book} ${cd.chapter}:${cd.verse}`;
+			}
+			function getnext_passage(offset) {
+				let cd = {...curversedata};
+				let verse = Number(cd.verse);
+				cd.verse = verse + offset;
+
+				if(cd.verse < 1){
+					cd.verse = 1;
+				}
+
+				let passage = `${cd.book} ${cd.chapter}:${cd.verse}`;
+				if(analysemsg(passage)){
+					let curversedata = {...cd};
+					updateRelevantos();
+					sendmsg();
+				}
+			}
+
+		// runtime stuff
+			function analysemsg(msg) {
+				let [book, chapter, verse, fincon] = [0,0,0,false];
+				let tip = "";
+				let cap = "";
+
+
+				if(!msg.includes(":")){
+					tip = "incomplete verse";
+				} else {
+					let hay = msg.split(":");
+					let tmp_fore = hay[0].split(" ");
+					let tmp_latter = hay[1].split("-");
+
+					chapter = tmp_fore.pop();
+					book = tmp_fore.join(" ").toLowerCase();
+					verse = tmp_latter[0];
+
+					console.log("latter -> ", tmp_latter[0])
+					console.log("analysing...",book, chapter, verse)
+
+					// find the book in the list, again
+					let tmp_found = 0,found_id = undefined;
+
+					thebks.forEach((el,id) => {
+						let tmp_con = el.name.toLowerCase() == book;
+						if(tmp_con){
+							tmp_found += 1;
+							found_id = id;
+						} else {
+							// console.log(`${el.name.toLowerCase()} == ${txt} -> ${tmp_con}`);
+						}
+					})
+
+					if(tmp_found > 0){
+						// check if chapters are ok
+						let chaps = Number(thebks[found_id].chapters);
+						cap = plural("chapter",Number(chaps));
+						fincon = chapter <= chaps;
+						console.log(`analysing: ${fincon} = ${chapter} <= ${chaps};`)
+
+						if(fincon){
+							// check if verses are okay
+							let n = Number(thebks[found_id].verses[chapter - 1]);
+							cap = plural("verse",(n));
+							fincon = Number(verse) < (n + 1);
+
+							console.log(`analysing verse: ${verse} <= ${n} -> ${fincon}`);
+							tip = fincon ? "" : `${book} ${chapter} has only ${n} ${cap}`;
+						} else {
+							tip = `${book} has only ${chaps} ${cap}`;
+						}
+					} else {
+						tip = `<b>${book}</b> is not a valid book`;
+					}
+				}
+
+				if(!fincon){
+					alert_danger(tip,3);
+				} else {
+					curversedata = {book, chapter, verse};
+				}
+
+				return fincon;
+			}
+
+			function sendThis(type,action) {
+				setTimeout(() => {
+					try{
+						let payload = `${type}->${action}`;
+						sendMessage(payload);
+					} catch(err){
+						alert_danger(err.message);
+						console.error(err);
+					}
+				},100);
+			}
+
+			function sendmsg() {
+				setTimeout(() => {
+					try{
+						let themsg = mekverse();
+
+						if(themsg != ""){
+							if(analysemsg(themsg)){
+								sendMessage(themsg);
+								// updateUI(50);
+								showreport();
+
+								/*
+								let show = autoshow.checked == true;
+								if(show){
+									showpanel();
+								}
+								// */
+
+								alert_success('passage sent')
+							}
+						} else {
+							alert_warning("enter a verse first",2);
+						}
+					} catch(err){
+						console.error(err);
+						alert_danger(err.message);
+					}
+				}, 50);
+			}
+
+			function hidepanel(){
+				panelsshown = false;
+				sendThis('action','hide');
+				// toggleShowB('#showbtn','inline-flex','none');
+				// toggleShowB('#hidebtn','inline-flex','none');
+			}
+			function showpanel() {
+				panelsshown = true;
+				sendThis('action','appear');
+				// toggleShowB('#hidebtn','inline-flex','none');
+				// toggleShowB('#showbtn','inline-flex','none')
+			}
+
+			function togglehostpanel() {
+				let c = hostshown ? 'hidethird' : 'showthird';
+				let v = hostshown ? 'hidden' : 'visible';
+				title_toggler.querySelector('span.state').innerHTML = `[${v}]`;
+				alert_dark(`lowerthird ${v}`);
+				sendThis('action',c);
+
+				hostshown = !hostshown;
+			}
+
+		// event listeners
+		const startguy = () => {
+			alert_info('starting UI');
+			initUIs();
+			loadbibleverses();
+		};
+
+		// keyboard shortcuts
+		window.addEventListener('keydown',e => {
+			if(e.altKey){
+				// disables default behavour unless shift is included in the command
+				if(!e.shiftKey){
+					e.preventDefault();
+				}
+
+				if(e.key.toLowerCase() == "s"){
+					if(panelsshown)
+						hidepanel();
+					else
+						showpanel();
+				}
+				if(e.key.toLowerCase() == "arrowup"){
+					sendThis('action','sizeup');
+				}
+				if(e.key.toLowerCase() == "arrowdown"){
+					sendThis('action','sizedown');
+				}
+				if(e.key.toLowerCase() == "arrowleft"){
+					getnext_passage(-1);
+				}
+				if(e.key.toLowerCase() == "arrowright"){
+					getnext_passage(1);
+				}
+				if(e.key.toLowerCase() == "r"){
+					sendmsg();
+				}
+				if(e.key.toLowerCase() == "d"){
+					// updateUI(1);
+				}
+				if(e.key.toLowerCase() == "a"){
+					togglehostpanel();
+				}
+			}
+
+			// console.log(e);
+		})
+
+		callOnLoad.push({act: setup_uimode});
+		callOnLoad.push({act: startguy});
+	</script>
+
+	<script>
+		// workers
+			function updateRelevantos() {
+				let cvd = curversedata;
+				let theverse = mekverse();
+
+				nptguy.value = theverse;
+				curverse.innerHTML = theverse;
+
+				controls.forEach(c => {
+					c.style.opacity = "1";
+					c.style.pointerEvents = "all";
+				})
+
+				if(theverse.toLowerCase() == "revelation 22:21"){
+					controls[1].style.opacity = "0.1";
+					controls[1].style.pointerEvents = "none";
+					// alert_warning("found end");
+				} else if(theverse.toLowerCase() == "genesis 1:1"){
+					controls[0].style.opacity = "0.1";
+					controls[0].style.pointerEvents = "none";
+					// alert_warning("found start");
+				}
+			}
+			function toggle_projector_options(con = false) {
+				if(con instanceof HTMLElement){
+					con = con.dataset.con.toLowerCase() == "true";
+				}
+
+				let cls = con ? "add" : "remove";
+				let cls2 = !con ? "add" : "remove";
+
+				alert_info('toggling projector options');
+				books_UI.classList[cls]('w3-hide');
+				options_UI.classList[cls2]('w3-hide');
+
+				if(con === true){
+					setTimeout(() => {
+						sendmsg();
+					}, 20);
+				} else {
+					curversedata = {
+						book: undefined,
+						chapter: undefined,
+						verse: undefined,
+					};
+				}
+
+				updateRelevantos();
+			}
+			function findbook(txt){
+				let tmp_found = 0
+				let found_id = undefined
+				let found = undefined;
+
+				thebks.forEach((el,id) => {
+					let tmp_con = el.name.toLowerCase() == txt.toLowerCase();
+					if(tmp_con){
+						tmp_found += 1;
+						found = el;
+					} else {
+						// console.log(`${el.name.toLowerCase()} == ${txt} -> ${tmp_con}`);
+					}
+				});
+
+				return found;
+			}
+			function mekverse() {
+				let cvd = curversedata;
+				let theverse = `${cvd.book || ''} ${cvd.chapter || ''}${cvd.verse == undefined ? '' : ':'}${cvd.verse || ''}`;
+
+				if(cvd.book == undefined){
+					theverse = '';
+				}
+				return theverse;
+			}
+			function toggleversepanel(m) {
+				let c = panelsshown ? 'hide' : 'appear';
+				let v = panelsshown ? 'hidden' : 'visible';
+				panel_toggler.querySelector('span.state').innerHTML = `[${v}]`;
+
+				sendThis('action',c);
+				panelsshown = !panelsshown;
+			}
+
+			function filterbooks_ui(wot) {
+				let its = books_UI.querySelectorAll('.item');
+
+				its.forEach(t => {
+					if(!(t.innerHTML.toLowerCase().includes(wot))){
+						t.classList.add('w3-hide');
+					}
+				});
+			}
+		// renderers
+			function render_these(n,wot,prev = ''){
+				let cap = wot;
+				shared_dis.innerHTML = '';
+
+				if(wot.toLowerCase() != 'books'){
+					for(let x = 1;x <= n;x++){
+						shared_dis.innerHTML += `
+							<div class="item slide-up" data-runme="set_${wot}" data-${wot}="${x}" style="${mekstagger(2,x)}">${x}</div>
+						`;
+					}
+
+					if(wot == 'chapter'){
+						cap = `${wot}s in ${curversedata.book}`;
+					}else if(wot == 'verse'){
+						cap = `${wot}s in ${curversedata.book} ${curversedata.chapter}`;
+					}
+				} else {
+					let books = [...bibleBooks.OldTestament,...bibleBooks.NewTestament];
+
+					books.forEach((b,x) => {
+						let bd = b.split('|');
+						let bk = bd[0], bc = bd[1];
+
+						shared_dis.innerHTML += `
+							<div class="item slide-up" data-runme="set_book" data-mybook="${bk}" data-chapters="${bc}" style="${mekstagger(2,x)}">${bk}</div>
+						`;
+					})
+				}
+
+				let anc = books_UI.querySelector(`[data-subrole="announce"]`);
+
+				if(anc != undefined){
+					anc.innerHTML = cap;
+				}
+			}
+
+		// runme ops
+			function set_book(el){
+				curversedata.chapter = undefined;
+				curversedata.verse = undefined;
+
+				let bk = el.dataset.mybook || '';
+				let chap = el.dataset.chapters || 0;
+				nptguy.value = `${bk} `;
+				curversedata.book = bk;
+				gettips();
+
+				render_these(chap,'chapter');
+				updateRelevantos();
+				refreshUI(200);
+			}
+			function set_chapter(el){
+				let bk = el.dataset.chapter || '';
+				curversedata.chapter = bk;
+				nptguy.value = `${curversedata.book} ${curversedata.chapter}:`;
+				gettips();
+
+				let bookdata = findbook(curversedata.book);
+				let verses = bookdata.verses;
+				let myverses = verses[Number(bk) - 1];
+				console.log('bookdata',bookdata);
+				console.log('verses',verses);
+				console.log('myverses',myverses);
+
+				render_these(myverses,'verse');
+				updateRelevantos();
+				refreshUI(200);
+			}
+			function set_verse(el) {
+				let bk = el.dataset.verse || '';
+				curversedata.verse = bk;
+				nptguy.value = `${curversedata.book} ${curversedata.chapter}:${curversedata.verse}`;
+
+				toggle_projector_options(true);
+				render_these('myverses','books');
+				updateRelevantos();
+				refreshUI(200);
+			}
+			function getnext_verse(el,bps = false){
+				if(!(el instanceof HTMLElement) && !bps){
+					alert_danger('invalid procedure call');
+					return;
+				}
+
+				getnext_passage(Number(el.dataset.offset));
+			}
+			function adjust_size(el) {
+				let con = el === true;
+
+				if(el instanceof HTMLElement){
+					con = el.dataset.offset == "1" || el.dataset.offset.toLowerCase() == "yes";
+				}
+
+				let wot = con ? 'sizeup' : 'sizedown';
+				sendThis('action',wot);
+			}
+			function changehostdetails() {
+				let inputs = [
+					{
+						typ: 'text',
+						field: 's_name',
+						label: 'speaker name',
+						placeholder: 'who is preaching today?',
+						required: true,
+						value: speaker_deets.s_name || '',
+					},
+					{
+						typ: 'select',
+						field: 's_title',
+						label: 'speaker title',
+						options: [
+							{"value" : 'minister'},
+							{"value" : 'Pastor'},
+							{"value" : 'Deacon'},
+							{"value" : 'Guest'},
+							{"value" : '', "caption" : "(leave blank)"},
+						],
+						value: speaker_deets.s_title || '',
+					},
+					{
+						typ: 'text',
+						field: 's_topic',
+						label: 'the topic',
+						placeholder: 'what is the topic?',
+						required: true,
+						value: speaker_deets.s_topic || '',
+					},
+				];
+
+				get_input("Enter speaker details",inputs,send_speaker_details);
+			}
+			window['send_speaker_details'] = (d) => {
+				console.log('speaker',speaker_deets,speaker_deets.s_name);
+
+				if(d instanceof HTMLElement){
+					if(speaker_deets.s_name == undefined){
+						alert_danger('speaker details unavailable')
+						return;
+					} else {
+						d = speaker_deets;
+					}
+				} else {
+					speaker_deets = d;
+				}
+
+				console.log('recieved',d);
+				let ts = JSON.stringify(d);
+				let final_pl = `set_speaker|||${ts}`;
+				console.log('payload',final_pl);
+				sendThis('data',final_pl);
+			};
+			window['try_send_msg'] = (el) => {
+				// alert_info('submitting');
+				gettips();
+
+				if(analysemsg(mekverse())){
+					alert_info('we good cheese');
+					toggle_projector_options(true);
+					updateRelevantos();
+					sendmsg();
+				}
+			}
+	</script>
+</body>
