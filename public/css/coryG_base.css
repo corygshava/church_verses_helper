@@ -1,0 +1,263 @@
+:root {
+    --darkcolor: #095bc0;
+    --clr-theme-dark: var(--darkcolor);
+    --clr-bg: #efefef;
+    --clr-bgglass: #efefefaa;
+    --clr-darkglass: #000000aa;
+    --clr-whiteglass: #efefefaa;
+    --clr-panelbg: #efefef;
+    --clr-alttext: #eee;
+    --clr-text: #222;
+    --clr-text-muted: #777;
+    --themeglow: 0 0 16px var(--themecolor);
+    --themeshadow: 0 0 16px rgba(0,0,0,0.7);
+    --overlaybg: rgba(0,0,0,0.8);
+    --size-tn: 8px;
+    --size-sm: 16px;
+    --size-nm: 24px;
+    --size-md: 32px;
+    --size-lg: 48px;
+    --size-mg: 64px;
+    /*--roundness: 8px;*/
+    --minspan: 800px;
+}
+
+/* UI kit */
+	/* ---------- headings ---------- */
+		.hedtxt,.h1,.hedtxt2,.h2,.hedtxt3,.h3{
+			font-weight: 800;
+			display: block;
+			width: 100%;
+			text-transform: capitalize;
+		}
+		.hedtxt,.h1{
+			font-size: min(var(--size-mg),14vw);
+		}
+		.hedtxt2,.h2{
+			font-size: min(var(--size-lg),7vw);
+		}
+		.hedtxt3,.h3{
+			font-size: min(var(--size-md,1.75vw));
+		}
+		.hedtxt b,.h1 b,.hedtxt2 b,.hedtxt3 b,.h2 b{color: var(--themecolor);}
+
+	/* ---------- 1. Buttons ---------- */
+		.btn{
+			display:inline-flex;
+			align-items:center;
+			justify-content:center;
+			gap:.5rem;
+			padding:.75rem 1.5rem;
+			border-radius:var(--roundness);
+			font-weight:600;
+			cursor:pointer;
+			border:none;
+		}
+		.btn.primary{background:var(--seccolor);color:#fff}
+		.btn.primary:hover{background:var(--clr-theme-dark);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+		.btn.outline{background:transparent;color:var(--themecolor);border:1px solid var(--themecolor)}
+		.btn.outline.light{background:transparent;color:var(--seccolor);border:1px solid var(--seccolor)}
+		.btn.outline:hover{background:var(--seccolor);color:#fff}
+
+	/* ------------ 6. navbar --------------- */
+		nav{
+			position:fixed;
+			top:0;
+			left:0;
+			width: 100%;
+			z-index:12;
+		}
+		/* styles when its not scrolled */
+		nav:not(.scrolled){
+			color: var(--clr-alttext) !important;
+			background: var(--clr-darkglass);
+			padding: 20px 40px;
+		}
+		/* styles when its scrolled */
+		nav.scrolled{
+			background-color: rgba(0, 0, 0, 0.7);
+		}
+		nav .navcon {
+			padding: 0 8px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 20px;
+		}
+		nav .navcon .navlinks{
+			/*padding: 32px;*/
+		}
+		nav .navcon .navlinks a{
+			padding: 8px 16px;
+			border-radius: var(--roundness);
+			position: relative;
+			overflow: hidden;
+		}
+		nav .navcon .navlinks a:not(.active):hover{
+			color: var(--themecolor);
+		}
+		nav .navcon .navlinks a::before{
+			border-radius: var(--roundness);
+			content: '';
+			position:absolute;
+			top:0;
+			left:0;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(80deg,var(--seccolor),var(--themecolor));
+			opacity: 0;
+			z-index: -1;
+		}
+		nav .navcon .navlinks a.active{
+			color: var(--clr-alttext);
+			font-weight: 800;
+		}
+		nav .navcon .navlinks a.active::before{
+			opacity: 1;
+		}
+		nav .logo{font-size:min(1.1rem, 7vw);font-weight:700;color:var(--themecolor)}
+
+	/* ------------ 6. modals --------------- */
+		.mymodal{
+			position: fixed;
+			top: 0;
+			bottom: 0;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			background: var(--overlaybg);
+			z-index: 24;
+		}
+		.mymodal.block{
+			background: var(--clr-bg);
+		}
+		.mymodal .modal-content{
+			padding: 24px 32px;
+			width: min(1000px, 96vw);
+			max-height: 96vh;
+			overflow: hidden auto;
+			border-radius: var(--roundness);
+			background: var(--clr-panelbg);
+			position: relative;
+		}
+		.mymodal .modal-content .closebtn{
+			position: absolute;
+			top: 0;
+			right: 0;
+			padding: var(--size-md);
+			background: transparent;
+			border:none;
+			cursor: pointer;
+			color: inherit;
+		}
+		.mymodal .modal-content .closebtn:hover{
+			color: red;
+			scale: 1.1;
+		}
+
+
+/* reusables x utilities */
+
+	.grid-30-70{display:grid;grid-template-columns:1fr 2fr;gap:3rem;align-items:center}
+	.grid-70-30{display:grid;grid-template-columns:2fr 1fr;gap:3rem;align-items:center}
+	.grid-50-50{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+
+	.container{width:min(90%,1200px);margin-inline:auto}
+	.fullheight{min-height: 100vh;}
+	.fullwidth{min-height: 100vw;}
+	.section{padding-block:5rem}
+
+	.cta-btn{
+		background: linear-gradient(80deg,var(--seccolor),var(--themecolor));
+		color: #fff;
+	}
+	.unsee{opacity: 0;}
+
+	.flow{
+		display: flex;
+		flex-direction: column;
+		justify-content:center;
+	}
+	.flow.center{
+		align-items: center;
+		gap: 16px;
+	}
+	.flow.left{
+		align-items: flex-start;
+		gap: 16px;
+	}
+	.flow.right{
+		align-items: flex-end;
+		gap: 16px;
+	}
+
+	.flowline{
+		display: flex;
+		flex-direction: row;
+		justify-content:center;
+	}
+	.gap-sm{gap: var(--size-sm);}
+	.gap-nm{gap: var(--size-nm);}
+	.gap-md{gap: var(--size-md);}
+	.gap-lg{gap: var(--size-lg);}
+	.gap-mg{gap: var(--size-mg);}
+
+	.text-sm{font-size: var(--size-sm);}
+	.text-nm{font-size: var(--size-nm);}
+	.text-md{font-size: var(--size-md);}
+	.text-lg{font-size: var(--size-lg);}
+	.text-mg{font-size: var(--size-mg);}
+
+	.spacy-sm{padding: var(--size-sm);}
+	.spacy-nm{padding: var(--size-nm);}
+	.spacy-md{padding: var(--size-md);}
+	.spacy-lg{padding: var(--size-lg);}
+	.spacy-mg{padding: var(--size-mg);}
+
+	.distance-sm{margin: var(--size-sm) 0;}
+	.distance-nm{margin: var(--size-nm) 0;}
+	.distance-md{margin: var(--size-md) 0;}
+	.distance-lg{margin: var(--size-lg) 0;}
+	.distance-mg{margin: var(--size-mg) 0;}
+	
+	.btn-group {
+		display: inline-flex;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+	.themetag{padding: var(--size-sm);background-color: var(--themecolor);color: var(--clr-alttext);font-weight: 800;}
+	.themebg{background-color: var(--themecolor);}
+	.themetxt{color: var(--themecolor);}
+	.modebg{background-color: var(--clr-bg);}
+	.panelbg{background-color: var(--clr-panelbg);}
+
+	.centroid{
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.progress{
+		background-color: var(--clr-panelbg);
+		border-radius: var(--roundness);
+		overflow: hidden;
+	}
+	.progress div{
+		height: var(--size-tn);
+		background: var(--themecolor);
+		width: 25%;
+	}
+
+	.stroked {
+		-webkit-text-stroke-width: 1px;
+		-webkit-text-stroke-color: #fbc800;
+		font-weight: 800;
+	}
+
+	.modetxt{color: var(--clr-text) !important;}
+	.modealttxt{color: var(--clr-alttext) !important;}
+	.panelbg{background-color: var(--clr-panelbg);}

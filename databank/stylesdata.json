@@ -1,0 +1,72 @@
+{
+    "id": "jbsdl1p",
+    "scenename": "Blue magic",
+    "scenetemplate": "\n\t\t\t<div class=\"content versedisplay\" data-role=\"[background]\">\n\t\t\t\t<span class=\"verse-text\" id=\"gottenverse\" data-role=\"[text1name]\">...</span>\n\t\t\t\t<span class=\"verse-location\" id=\"output\" data-role=\"[text2name]\">Waiting for verse...</span>\n\t\t\t</div>",
+    "myelements": [
+        {
+            "id": "o41px3r",
+            "mytype": "text",
+            "demotext": "I can do all things through christ who stregnthens me",
+            "styles": {
+                "color": "#ffffff",
+                "fontWeight": 700,
+                "outlineColor": "#000000",
+                "outlineWidth": 0,
+                "fontSize": 36,
+                "fontFamily": "Segoe UI, sans-serif"
+            }
+        },
+        {
+            "id": "ekj3rxf",
+            "mytype": "text",
+            "demotext": "Phillipians 4:13",
+            "styles": {
+                "color": "#ffea00",
+                "fontWeight": 500,
+                "outlineColor": "#000000",
+                "outlineWidth": 0,
+                "fontSize": 20,
+                "fontFamily": "Segoe UI, sans-serif"
+            }
+        },
+        {
+            "id": "aaytcve",
+            "mytype": "background",
+            "demotext": "",
+            "styles": {
+                "style": "gradient",
+                "color": "#205cdf",
+                "gradient": {
+                    "type": "linear",
+                    "colors": [
+                        "#00a1e6",
+                        "#00188f"
+                    ],
+                    "angle": 135
+                },
+                "image": {
+                    "src": "",
+                    "size": "cover",
+                    "attachment": "scroll"
+                }
+            }
+        },
+        {
+            "id": "slide",
+            "mytype": "slide",
+            "styles": {
+                "enter": {
+                    "name": "slideIn",
+                    "duration": "600ms",
+                    "easing": "ease-out"
+                },
+                "exit": {
+                    "name": "zoomOut",
+                    "duration": "600ms",
+                    "easing": "ease-in"
+                }
+            }
+        }
+    ],
+    "datecreated": 1755350710143
+}

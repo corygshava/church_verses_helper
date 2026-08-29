@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Worship Helper PRO – Docs</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        :root{
+            --bg:#0d1117;
+            --bg2:#0a0f13;
+            --accent:#10b981;
+            --accent2:#34d399;
+            --text:#f0f6fc;
+            --muted:#8b949e;
+            --font:'Inter',system-ui, sans-serif;
+        }
+        html{scroll-behavior: smooth;}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:var(--font);
+            background:radial-gradient(ellipse at 70% 30%, #0d1f17 0%, var(--bg2) 100%);
+            color:var(--text);
+            line-height:1.6;
+            scroll-behavior:smooth;
+        }
+        header{
+            padding:2rem 4%;
+            border-bottom:1px solid rgba(16,185,129,.15);
+            backdrop-filter:blur(4px);
+            position:sticky;top:0;z-index:10;
+            background:rgba(10,15,19,.65);
+        }
+        header h1{
+            font-size:1.75rem;
+            font-weight:700;
+            background:linear-gradient(135deg,var(--accent),var(--accent2));
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            letter-spacing:-.02em;
+        }
+        nav{
+            margin-top:.75rem;
+            display:flex;gap:1.5rem;
+            flex-wrap:wrap;
+        }
+        nav a{
+            color:var(--muted);
+            text-decoration:none;
+            font-size:.875rem;
+            font-weight:500;
+            transition:.2s;
+        }
+        nav a:hover{color:var(--accent)}
+        main{max-width:960px;margin:0 auto;padding:3rem 4% 5rem}
+        section{margin-bottom:3rem;padding-top: 12rem;}
+        h2{
+            font-size:1.5rem;
+            font-weight:700;
+            margin-bottom:1rem;
+            color:var(--text);
+            letter-spacing:-.01em;
+        }
+        h3{
+            font-size:1.125rem;
+            font-weight:600;
+            margin:1.5rem 0 .5rem;
+            color:var(--accent);
+        }
+        p,li{
+            font-size:.95rem;
+            color:var(--muted);
+        }
+        ul{margin-left:1.25rem}
+        code{
+            background:#11181f;
+            border:1px solid rgba(16,185,129,.2);
+            padding:.2rem .45rem;
+            border-radius:.35rem;
+            font-family:'JetBrains Mono',monospace;
+            font-size:.825em;
+        }
+        pre{
+            background:#0f161b;
+            padding:1rem;
+            border-radius:.5rem;
+            overflow-x:auto;
+            border:1px solid rgba(16,185,129,.15);
+            margin:.75rem 0;
+        }
+        .badge{
+            display:inline-block;
+            background:rgba(16,185,129,.15);
+            color:var(--accent2);
+            font-size:.75rem;
+            padding:.25rem .5rem;
+            border-radius:.375rem;
+            margin-left:.5rem;
+            vertical-align:middle;
+            font-weight:600;
+        }
+        footer{
+            text-align:center;
+            padding:2rem;
+            font-size:.75rem;
+            color:var(--muted);
+        }
+        ::selection{background:var(--accent);color:var(--bg)}
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Worship Helper PRO – Docs</h1>
+    <nav>
+        <a href="#user">User Rundown</a>
+        <a href="#dev">Developer Rundown</a>
+        <a href="#tips">Dev Tips</a>
+    </nav>
+</header>
+
+<main>
+
+    <section id="user">
+        <h2>User Rundown <span class="badge">Features they’ll interact with</span></h2>
+
+        <h3>Toolbar (Top Bar)</h3>
+        <ul>
+            <li><strong>App name:</strong> Worship Helper PRO – branding always visible.</li>
+            <li><strong>Scene Switcher:</strong> dropdown to swap between saved scenes.</li>
+            <li><strong>Scene Import:</strong> button to import a scene JSON file.</li>
+            <li><strong>Light/Dark Mode Toggle:</strong> instant switch with gradient backgrounds.</li>
+        </ul>
+
+        <h3>Left Sidebar (Layers Panel)</h3>
+        <p>Shows every element in the current scene—text, background, slide layer—stacked like layers. Clicking a layer selects it and loads its properties into the right panel.</p>
+
+        <h3>Canvas (Center Stage)</h3>
+        <p>Live preview of the selected scene. All style or animation changes update in real-time.</p>
+
+        <h3>Right Sidebar (Properties Panel)</h3>
+        <ul>
+            <li><strong>Text:</strong> color, font-weight (200–900), outline, size, family.</li>
+            <li><strong>Background:</strong> plain, gradient (linear, radial, conical), or image. Full-size, repeat, attachment controls.</li>
+            <li><strong>Slide:</strong> entrance/exit animations (3 presets each) with duration & easing.</li>
+        </ul>
+
+        <h3>Bottom Panel (Runtime Details)</h3>
+        <p>Current scene name, number of elements, date created, active mode (Light/Dark).</p>
+
+        <h3>Modal Tutorial</h3>
+        <p>Auto-opens on first load; covers scene switching, text & background editing, and exporting. Triggerable again via menu.</p>
+
+        <h3>Send Button</h3>
+        <p>Transmits current scene styles as JSON via <code>POST /api_stylesmanager</code> and mirrors the payload through WebSocket <code>sendMessage()</code>.</p>
+    </section>
+
+    <section id="dev">
+        <h2>Developer Rundown <span class="badge">How it works</span></h2>
+
+        <h3>File Structure</h3>
+        <pre><code>index.html   → main SPA
+css/style.css → dark-gradient theme + light override
+js/app.js     → core logic, WebSocket, API glue</code></pre>
+
+        <h3>Core Concepts</h3>
+        <ul>
+            <li><strong><code>thescenes</code></strong> array – populated from <code>/api_getscenes</code>; falls back to a default scene.</li>
+            <li><strong>Scene object shape:</strong>
+                <pre><code>{
+  scenename: "Default",
+  scenetemplate: "&lt;div class='content versedisplay'&gt;...&lt;/div&gt;",
+  myelements: [
+    { mytype: "text", demotext: "Sample Verse" },
+    { mytype: "background", demotext: "" }
+  ],
+  datecreated: "2025-08-16T12:00:00Z"
+}</code></pre>
+            </li>
+        </ul>
+
+        <h3>Realtime Updates & Property Binding</h3>
+        <p>Selecting a layer populates the right panel. <code>oninput/change</code> events instantly update both the DOM canvas and the in-memory scene object.</p>
+
+        <h3>WebSocket</h3>
+        <p>Global <code>socket</code> variable. <code>sendMessage(msg)</code> centralizes all outbound WS traffic—handy for debugging.</p>
+
+        <h3>API Endpoints</h3>
+        <ul>
+            <li><code>/api_getscenes</code> – initial scene list</li>
+            <li><code>/api_uploadimg</code> – upload image, returns new path</li>
+            <li><code>/api_getimages</code> – list of available images</li>
+            <li><code>/api_stylesmanager</code> – accepts style payloads via POST</li>
+        </ul>
+
+        <h3>Payload Structure Example</h3>
+        <pre><code>{
+  "scene": "Scene1",
+  "txtstyles": { "txt_color": "#fff", "txt_fontweight": 600 },
+  "bgstyles": { "bg_style": "image", "bgdata": { "bg_d_src": "path/to/img" } },
+  "slidestyles": { "slide_entrance": "fade", "slide_duration": 2 }
+}</code></pre>
+
+        <h3>Light/Dark Mode</h3>
+        <p>CSS class toggle on <code>&lt;body&gt;</code>; default dark with smooth 0.3 s transitions.</p>
+
+        <h3>Tutorial Modal & Runtime Panel</h3>
+        <p>Modal visibility tracked in <code>localStorage</code>. Runtime panel reads directly from <code>thescenes</code> and updates on every scene change.</p>
+    </section>
+
+    <section id="tips">
+        <h2>Dev Tips <span class="badge">Quick wins</span></h2>
+        <ul>
+            <li>Add new style properties by extending the right-panel HTML and binding <code>oninput</code> to update <code>scene.myelements</code> & canvas.</li>
+            <li>New API? Add another fetch handler in <code>app.js</code>.</li>
+            <li>Debug WebSocket traffic via <code>sendMessage()</code>—every payload passes through it.</li>
+            <li>Scene import/export is plain JSON—back up or share scenes easily.</li>
+        </ul>
+    </section>
+
+</main>
+
+<footer>
+    Worship Helper PRO Docs &copy; 2025
+</footer>
+
+</body>
+</html>

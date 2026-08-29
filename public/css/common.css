@@ -1,0 +1,26 @@
+/* holds reusable classes and most css variables */
+
+:root {
+    --themecolor: #070d61;
+    --seccolor: #109be4;
+    --textcolor: #fefefe;
+    --alttextcolor: #222;
+    --panelbg: #222;
+    --bodybg: #333;
+    --shadow-light: #efefef;
+    --shadow-dark: #000000aa;
+    --darker-bg: #aaa;
+    --roundness: 16px;
+    --shadowFar: 0 0 12px rgba(0,0,0,0.2);
+
+    --verse-size: 6.7rem;
+    --verse-text-size: 3.3rem;
+}
+
+*{
+    box-sizing: border-box;
+    transition: 0.3s ease-out;
+}
+html{
+    scroll-behavior: smooth;
+}
