@@ -655,9 +655,15 @@
 			function filterbooks_ui(wot) {
 				let its = books_UI.querySelectorAll('.item');
 
+				if(curversedata.books != undefined){
+					return;
+				}
+
 				its.forEach(t => {
 					if(!(t.innerHTML.toLowerCase().includes(wot))){
 						t.classList.add('w3-hide');
+					} else {
+						t.classList.remove('w3-hide');
 					}
 				});
 			}
