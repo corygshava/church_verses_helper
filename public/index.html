@@ -5,36 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Worship helper | all in one bible display solution</title>
 
-    <link rel="stylesheet" href="css/fa-all.css">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/w3.css">
-
-    <script src="js/customalerter.js"></script>
-    <script src="js/SuperScript.js"></script>
-    <script src="js/toappend.js"></script>
     <script src="js/animate.js"></script>
+    
+    <link rel="stylesheet" href="./cbl/_assets/_vendor/BS4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./cbl/_assets/css/fa-all.css">
+    <link rel="stylesheet" href="./cbl/_assets/css/w3.css">
+    <link rel="stylesheet" href="./cbl/_assets/css/coryG_UIOps.css">
+    <link rel="stylesheet" href="./cbl/_assets/css/coryG_base.css">
+    <link rel="stylesheet" href="./cbl/_assets/css/fonts.css">
+    <link rel="stylesheet" href="./cbl/_assets/css/animate.css">
+    <link rel="stylesheet" href="./cbl/_assets/css/mediaoptima.css">
+    
+    <link rel="stylesheet" type="text/css" href="./cbl/_assets/css/inter_slop.css">
+    <!-- <link rel="stylesheet" type="text/css" href="./cbl/_assets/css/kimi_slop.css"> -->
+    
+    <script src="./cbl/_assets/_vendor/misc/jquery-3.6.0.min.js"></script>
+    <script src="./cbl/_assets/_vendor/misc/popper.min.js"></script>
+    <script src="./cbl/_assets/_vendor/misc/qrcode.min.js"></script>
+    <!-- <script src="./cbl/_assets/js/chart.js"></script> -->
+    <script src="./cbl/_assets/js/SuperScript.js"></script>
+    <script src="./cbl/_assets/js/toappend.js"></script>
+
+    <script src="./cbl/_assets/_vendor/BS4/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- <script src="./cbl/_assets/js/anims.js"></script> -->
+    <script src="./cbl/_assets/js/coryG_UIOps.js"></script>
+    <script src="./cbl/_assets/js/customalerter.js"></script>
+    <script src="./cbl/_assets/js/super_encryptor.js"></script>
+    <script src="./cbl/_assets/js/app.js"></script>
+
+    <!-- <link rel="stylesheet" href="css/styles.css"> -->
+    <link rel="stylesheet" href="css/common.css">
+
+    <style></style>
 </head>
-<body class="centroid">
-    <div class="content">
-        <div class="hero">
-            <h1 class="hed1">Welcome to worship helper</h1>
-            <p>pick one to continue</p>
-        </div>
-        <div class="sections sitemenu">
-            <a href="signal_receiver.html" class="sitelink">
-                <i class="fa fa-eye"></i>
-                <span>screen preview</span>
-            </a>
-            <a href="sender_2.html" class="sitelink">
-                <i class="fa fa-microchip"></i>
-                <span>remote</span>
-            </a>
-            <a href="settings.html" class="sitelink w3-hid">
-                <i class="fa fa-cog"></i>
-                <span>settings</span>
-            </a>
+<body class="intro">
+    <div class="contaier-fluid flow centroid">
+        <div class="content">
+            <div class="maino">
+                <h1 class="hed1">Welcome to worship helper</h1>
+                <p>pick one to continue</p>
+            </div>
+            <div class="sections sitemenu">
+                <a href="signal_receiver.html" class="sitelink">
+                    <i class="fa fa-eye"></i>
+                    <span>screen preview</span>
+                </a>
+                <a href="sender_2.html" class="sitelink">
+                    <i class="fa fa-microchip"></i>
+                    <span>remote</span>
+                </a>
+                <a href="settings.html" class="sitelink w3-hid">
+                    <i class="fa fa-cog"></i>
+                    <span>settings</span>
+                </a>
+            </div>
         </div>
     </div>
+
+    <script>
+        let server_ip_address = undefined;
+
+        const send_xhr = (loc = './',pld = {fromXHR: true},meth = 'GET',callback = () => {alert_success('XHR complete')}) => {
+            // let loc = './api_getip';
+            let xh = new XMLHttpRequest();
+
+            xh.onload = (d) => {
+                console.log('recieved_data',d.target.response);
+                callback(d.target.response);
+            }
+
+            xh.open(meth,loc,true);
+            xh.send();
+        }
+
+        const try_get_ip = () => {
+            const process_ip = (d) => {
+                try{
+                    console.log('recieved_via callback',d);
+                    let res = JSON.parse(d);
+
+                    server_ip_address = res.echo;
+                }catch(err){
+                    console.error(err);
+                    alert_danger(err.message);
+                    alert_danger('error getting IP address');
+                }
+            }
+
+            send_xhr('./api_getip',{nada: false},'GET',process_ip);
+        }
+
+        callOnLoad.push({act: setup_uimode});
+        callOnLoad.push({act: try_get_ip});
+    </script>
 </body>
 </html>

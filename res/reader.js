@@ -1,5 +1,6 @@
 const fs = require("fs").promises;
 const path = require("path");
+const os = require('os');
 
 /**
  * Ensures a file exists at given path.
@@ -56,4 +57,29 @@ async function savepayload(thedata, thepath = "./databank/payloads.txt") {
     }
 }
 
-module.exports = { readMyData, savepayload, ensureFile };
+function getCurrentIP(){
+    // does what you think it does
+    const interfaces = os.networkInterfaces();
+    let tmpres = [];
+    let out_ip = null;
+    tmpres.push(interfaces);
+
+    // for(const name of Object.keys(interfaces))
+    Object.keys(interfaces).forEach(name => {
+        // tmpres.push(name); // gets interfaces basically shit like wifi and the rest
+        // tmpres.push(interfaces[name])
+        interfaces[name].forEach(_i => {
+            // _i is an interface
+            // only send ip if its ipv4 (the readable one you can put in a browser) and it isnt internal for some reason
+            if((_i.family.toLowerCase() == 'ipv4' || _i.family === 4) && !_i.internal){
+                out_ip = _i.address;
+            }
+        })
+    });
+
+    // return tmpres;
+    return out_ip;
+}
+
+
+module.exports = { readMyData, savepayload, ensureFile, getCurrentIP };

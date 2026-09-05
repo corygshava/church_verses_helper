@@ -1,4 +1,4 @@
-const { readMyData, savepayload } = require('./reader');
+const { readMyData, savepayload, getCurrentIP } = require('./reader');
 
 async function handlereq(path,body, callback){
 	let res = {success: false,echo: 'Invalid endpoint'}
@@ -13,6 +13,9 @@ async function handlereq(path,body, callback){
 		// console.log("body",JSON.stringify(body,null,4));
 		let dta = await readMyData('./databank/stylesdata.json');
 		res = {success:true,echo: dta}
+	} else if(path === '/api_getip') {
+		let dta = getCurrentIP();
+		res = {success: true,echo: dta};
 	}
 
 	callback(res)
