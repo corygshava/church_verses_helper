@@ -18,7 +18,7 @@
     
     <link rel="stylesheet" type="text/css" href="./cbl/_assets/css/inter_slop.css">
     <!-- <link rel="stylesheet" type="text/css" href="./cbl/_assets/css/kimi_slop.css"> -->
-    
+
     <script src="./cbl/_assets/_vendor/misc/jquery-3.6.0.min.js"></script>
     <script src="./cbl/_assets/_vendor/misc/popper.min.js"></script>
     <script src="./cbl/_assets/_vendor/misc/qrcode.min.js"></script>
@@ -37,15 +37,33 @@
     <!-- <link rel="stylesheet" href="css/styles.css"> -->
     <link rel="stylesheet" href="css/common.css">
 
-    <style></style>
+    <style>
+        :root{
+            --clr-bg: transparent;
+        }
+        body{
+            background-color: transparent;
+        }
+        .hero{
+            background-color: transparent;
+        }
+        .hero::before,.hero::after{display: none;}
+    </style>
 </head>
 <body class="intro">
-    <div class="contaier-fluid flow centroid">
-        <div class="content">
-            <div class="maino">
-                <h1 class="hed1">Welcome to worship helper</h1>
-                <p>pick one to continue</p>
-            </div>
+    <div class="w3-top flowline right spacy-sm" style="z-index: 3">
+        <button class="mybtn primary" data-runme="tryshowqr"><i class="fas fa-qrcode"></i></button>
+    </div>
+    <header class="hero" id="hero">
+        <!-- <div class="hero-glow mainglow" aria-hidden="true"></div> -->
+        <div class="hero-stuff">
+            <h1 class="mytitle">
+                <span class="line">Worship <span class="gradient-text">Helper</span></span>
+            </h1>
+            <p class="subtitle">
+                a collection of some of my most usefull project pieces.
+            </p>
+
             <div class="sections sitemenu">
                 <a href="signal_receiver.html" class="sitelink">
                     <i class="fa fa-eye"></i>
@@ -61,7 +79,11 @@
                 </a>
             </div>
         </div>
-    </div>
+        <div class="scrollguy" aria-hidden="true">
+            <span>hope you enjoy</span>
+            <div class="the-line"></div>
+        </div>
+    </header>
 
     <script>
         let server_ip_address = undefined;
@@ -96,7 +118,34 @@
             send_xhr('./api_getip',{nada: false},'GET',process_ip);
         }
 
-        callOnLoad.push({act: setup_uimode});
+        window['tryshowqr'] = async (el) => {
+            let spl = window.location.href.split(':');
+            let proto = spl[0];
+            let port = spl[2];
+            let link = `${proto}://${server_ip_address}:${port}/`;
+            let encodedText = encodeURIComponent(link);
+            let objUrl = await mekQRCode(encodedText, 100);
+            
+            let outht = `
+                <div class="flow center">
+                    <div>
+                        <span>Scan this code to connect</span>
+                    </div>
+                    <div>
+                        <img src="${objUrl}">
+                    </div>
+                </div>
+            `;
+
+            mekModal({
+                title: 'Connection QR code',
+                sub: '',
+                content: outht,
+                size: 'xl',
+            });
+        }
+
+        // callOnLoad.push({act: setup_uimode});
         callOnLoad.push({act: try_get_ip});
     </script>
 </body>
