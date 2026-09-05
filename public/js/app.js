@@ -8,6 +8,9 @@
 	let default_font = 6.7;
 	let curscale = 1.0;
 	let curstyles_viewer = {};
+	let server_ip_address = undefined;
+
+	let qr_tries = 0;
 
 const socket = new WebSocket(`ws://${window.location.host}`);
 
@@ -147,13 +150,92 @@ dataops['set_speaker'] = (d) => {
 	thespeaker.innerHTML = `by ${dta.s_title} ${dta.s_name}`;
 }
 
-
 function bring_forth() {
 	mainpanel.animate(entrance,timing);
 }
 function hide_panel() {
 	mainpanel.animate([...entrance].reverse(),timing);
 }
+
+const send_xhr = (loc = './',pld = {fromXHR: true},meth = 'GET',callback = () => {alert_success('XHR complete')}) => {
+	// let loc = './api_getip';
+	let xh = new XMLHttpRequest();
+
+	xh.onload = (d) => {
+		console.log('recieved_data',d.target.response);
+		callback(d.target.response);
+	}
+
+	xh.open(meth,loc,true);
+	xh.send();
+}
+
+const try_get_ip = () => {
+	const process_ip = (d) => {
+		try{
+			console.log('recieved_via callback',d);
+			let res = JSON.parse(d);
+
+			server_ip_address = res.echo;
+		}catch(err){
+			console.error(err);
+			alert_danger(err.message);
+			alert_danger('error getting IP address');
+		}
+	}
+
+	send_xhr('./api_getip',{nada: false},'GET',process_ip);
+}
+
+window['tryshowqr'] = async (el) => {
+	const renderit = async () => {
+		alert_info('generating QR code');
+		let spl = window.location.href.split(':');
+		let proto = spl[0];
+		let port = spl[2].split('/')[0];
+		let link = `${proto}://${server_ip_address}:${port}/`;
+		// let encodedText = encodeURIComponent(link);
+		let encodedText = link;
+		let objUrl = await mekQRCode(encodedText, 100);
+		
+		let outht = `
+			<div class="flow center w3-white themeround spacy-md">
+				<div>
+					<span class="w3-text-black">Scan this code to connect</span>
+				</div>
+				<div>
+					<img src="${objUrl}">
+				</div>
+			</div>
+		`;
+
+		mekModal({
+			title: 'Connection QR code',
+			sub: '',
+			content: outht,
+			size: 'xl',
+		});
+
+		alert_success('qr code generated successfully');
+	};
+
+	// run in a semi infinite loop till we get the server  address
+	if(server_ip_address == undefined){
+		alert_warning('server details missing, fetching them');
+		try_get_ip();
+
+		if(qr_tries < 12){
+			setTimeout(() => {
+				qr_tries += 1;
+				tryshowqr();
+			},2000)
+		}
+	} else {
+		qr_tries = 0;
+		renderit();
+	}
+}
+
 
 // setTimeout(() => {test_getverse("John 3:16-17")},1000);
 
