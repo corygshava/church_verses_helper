@@ -126,18 +126,50 @@
 			flex: 1;
 		}
 		.upbtn{display: none !important;}
+
+		@media (max-width:992px){
+			.sidemenu{
+				position: fixed;
+				top: 0;
+				right: 0;
+				height: 100%;
+				width: 100%;
+				max-width: 300px;
+				background: rgba(0, 0, 0, 0.98);
+				translate: 100px 0;
+				pointer-events: none;
+				opacity: 0;
+			}
+			.sidemenu.show{
+				opacity: 1;
+				translate: 0 0;
+				pointer-events: all;
+			}
+		}
+
+		body:has(.sidemenu.show) .myicon{
+			rotate: 180deg;
+		}
 	</style>
 </head>
 <body data-mode="dark">
+	<div class="w3-top flowline right spacy-sm" style="z-index: 3;width: auto;right: 0;">
+        <button class="mybtn primary" data-runme="tryshowqr"><i class="fas fa-qrcode"></i></button>
+        <button class="mybtn primary" data-runme="togglemenu" data-visibledata="1,1,0"><i class="fas fa-arrow-left myicon"></i></button>
+    </div>
 	<div class="w3-bottom spacy-md flowline gap-sm left" style="z-index: 3;width:auto;">
 		<button class="circle_btn" data-myclass="circle_btn" data-runme="toggle_ui_mode" id="mode_indicator"><i class="fa fa-circle-notch"></i></button>
+	</div>
+
+	<div class="w3-bottom spacy-md flowline gap-sm right" style="z-index: 3;width:auto;right: 0;">
+		<button class="mybtn primary" data-runme="togglemenu" data-visibledata="1,1,0"><i class="fas fa-arrow-left myicon"></i></button>
 	</div>
 
 	<div class="tabsguy">
 		<div class="tab pick_verse">
 			<div class="inner_guy spacy-sm">
 				<div class="input_section flow center spacy-tn">
-					<h1 id="announce">Pick a verse</h1>
+					<h1 id="announce" class="titletxt">Pick a verse</h1>
 					<span class="tiptxt">--</span>
 
 					<form class="verse_type_area w3-red" data-onsubmit="try_send_msg" data-blockdefault="yes">
@@ -176,8 +208,8 @@
 
 			<div class="divider" data-visibledata="0,0,1"></div>
 
-			<div class="sidemenu spacy-sm">
-				<h2 class="w3-center my-4">Toolbar</h2>
+			<div class="sidemenu spacy-sm" id="mysidemenu">
+				<h2 class="w3-center distance-md spacy-tn">Toolbar</h2>
 				<div class="flow gap-tn">
 					<button class="mybtn primary in_fullwidth" onclick="toggleversepanel(this)" id="panel_toggler">
 						<i class="fa fa-desktop"></i> toggle panel <span class="state"></span>
@@ -829,6 +861,9 @@
 					updateRelevantos();
 					sendmsg();
 				}
+			}
+			window['togglemenu'] = (el) => {
+				document.querySelector('#mysidemenu').classList.toggle('show');
 			}
 	</script>
 </body>

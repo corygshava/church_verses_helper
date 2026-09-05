@@ -24,37 +24,6 @@ a{
 	opacity: 0;
 }
 
-/* homepage */
-	.sitemenu{
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: center;
-		flex-wrap: wrap;
-		gap: 24px;
-	}
-	.sitemenu .sitelink{
-		flex: 0 0 250px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: 16px;
-		padding: 24px 12px;
-
-		box-shadow: 3px 3px 24px var(--shadow-dark);
-		border-radius: var(--roundness);
-	}
-	.sitemenu .sitelink:hover{
-		scale: 1.1;
-		/*box-shadow: 0 0 12px var(--seccolor);*/
-		background: var(--seccolor);
-		color: var(--alttextcolor);
-	}
-	.sitemenu .sitelink i{
-		font-size: 2.4rem;
-	}
-
 /* page for showing the verses */
 	.content{
 		width: 96%;
