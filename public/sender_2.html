@@ -134,8 +134,9 @@
 				right: 0;
 				height: 100%;
 				width: 100%;
-				max-width: 300px;
-				background: rgba(0, 0, 0, 0.98);
+				max-width: 350px;
+				background: rgba(230, 230, 230, 0.744);
+				backdrop-filter: blur(5px);
 				translate: 100px 0;
 				pointer-events: none;
 				opacity: 0;
@@ -144,6 +145,10 @@
 				opacity: 1;
 				translate: 0 0;
 				pointer-events: all;
+				backdrop-filter: blur(5px) saturate(160%);
+			}
+			[data-mode="dark"] .sidemenu{
+				background: rgba(0, 0, 0, 0.748);
 			}
 		}
 
